@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -60,7 +61,9 @@ export default function AddTransactionForm({
         console.log('Loading transaction categories...');
         const categoriesData = await fetchTransactionCategories();
         console.log('Fetched categories:', categoriesData);
-        setCategories(categoriesData || []);
+        
+        // Ensure we always have an array, even if the API returns null/undefined
+        setCategories(Array.isArray(categoriesData) ? categoriesData : []);
       } catch (error) {
         console.error('Error loading categories:', error);
         toast.error('Failed to load categories');

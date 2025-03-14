@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -73,7 +74,7 @@ const ProjectOverview: React.FC<ProjectOverviewProps> = ({
         <Card className="lg:col-span-3">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle>Financial Summary</CardTitle>
-            <Button variant="outline" size="sm" onClick={onAddTransactionClick} className="Check this button in financial summary you have Add Transaction, all that form is not working, lets recreate it\n">
+            <Button variant="outline" size="sm" onClick={onAddTransactionClick}>
               <PlusCircle className="mr-1 h-4 w-4" />
               Add Transaction
             </Button>

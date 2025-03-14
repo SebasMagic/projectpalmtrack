@@ -26,9 +26,8 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
   const safeCategories = Array.isArray(categories) ? categories : [];
   
   // Filter categories by selected type
-  const filteredCategories = safeCategories.filter(category => 
-    category && category.type === selectedType
-  );
+  const filteredCategories = safeCategories
+    .filter(category => category && typeof category === 'object' && category.type === selectedType);
   
   console.log('Safe categories:', safeCategories);
   console.log('Filtered categories:', filteredCategories);
@@ -67,7 +66,7 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
                 <CommandInput placeholder="Search category..." />
                 <CommandEmpty>No category found.</CommandEmpty>
                 <CommandGroup>
-                  {filteredCategories.length > 0 ? (
+                  {filteredCategories && filteredCategories.length > 0 ? (
                     filteredCategories.map((category) => (
                       <CommandItem
                         value={category.name}
