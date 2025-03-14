@@ -6,12 +6,15 @@ import { PlusCircle, Coins, BarChart3, Percent, CheckCircle } from "lucide-react
 import { Project, Transaction, ProjectFinancials } from '@/lib/types';
 import TransactionTable from '@/components/TransactionTable';
 import StatCard from './StatCard';
+import PLTracker from '@/components/PLTracker';
+
 interface ProjectOverviewProps {
   project: Project;
   transactions: Transaction[];
   financials: ProjectFinancials;
   onAddTransactionClick: () => void;
 }
+
 const formatDate = (dateString: string | null) => {
   if (!dateString) return '-';
   return new Date(dateString).toLocaleDateString('en-US', {
@@ -20,6 +23,7 @@ const formatDate = (dateString: string | null) => {
     year: 'numeric'
   });
 };
+
 const formatCurrency = (amount: number) => {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
@@ -27,6 +31,7 @@ const formatCurrency = (amount: number) => {
     maximumFractionDigits: 0
   }).format(amount);
 };
+
 const ProjectOverview: React.FC<ProjectOverviewProps> = ({
   project,
   transactions,
@@ -68,12 +73,21 @@ const ProjectOverview: React.FC<ProjectOverviewProps> = ({
             </div>
           </CardContent>
         </Card>
+        
+        <Card>
+          <CardHeader>
+            <CardTitle>Financial Summary</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <PLTracker transactions={transactions} financials={financials} />
+          </CardContent>
+        </Card>
       </div>
       
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
           <CardTitle>Transactions</CardTitle>
-          <Button variant="outline" size="sm" onClick={onAddTransactionClick} className="Erase this buttom and all the code\n">
+          <Button variant="outline" size="sm" onClick={onAddTransactionClick}>
             <PlusCircle className="mr-1 h-4 w-4" />
             Add Transaction
           </Button>
@@ -84,4 +98,5 @@ const ProjectOverview: React.FC<ProjectOverviewProps> = ({
       </Card>
     </div>;
 };
+
 export default ProjectOverview;
