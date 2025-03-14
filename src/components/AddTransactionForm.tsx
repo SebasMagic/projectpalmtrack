@@ -60,10 +60,11 @@ export default function AddTransactionForm({
       try {
         const categoriesData = await fetchTransactionCategories();
         console.log('Fetched categories:', categoriesData);
-        setCategories(categoriesData);
+        setCategories(categoriesData || []);
       } catch (error) {
         console.error('Error loading categories:', error);
         toast.error('Failed to load categories');
+        setCategories([]);
       } finally {
         setIsLoading(false);
       }

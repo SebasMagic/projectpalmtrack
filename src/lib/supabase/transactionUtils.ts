@@ -87,20 +87,34 @@ export const fetchProjectFinancials = async (projectId: string) => {
  * Fetches transaction categories from database
  */
 export const fetchTransactionCategories = async (): Promise<TransactionCategory[]> => {
-  const { data, error } = await supabase
-    .from('transaction_categories')
-    .select('*')
-    .order('name');
-  
-  if (error) {
-    console.error('Error fetching transaction categories:', error);
+  try {
+    console.log('Fetching transaction categories...');
+    const { data, error } = await supabase
+      .from('transaction_categories')
+      .select('*')
+      .order('name');
+    
+    if (error) {
+      console.error('Error fetching transaction categories:', error);
+      toast.error('Failed to load transaction categories');
+      return [];
+    }
+    
+    console.log('Fetched categories data:', data);
+    
+    if (!data || data.length === 0) {
+      console.warn('No transaction categories found');
+      return [];
+    }
+    
+    return data.map(category => ({
+      id: category.id,
+      name: category.name,
+      type: category.type as 'income' | 'expense'
+    }));
+  } catch (error) {
+    console.error('Unexpected error in fetchTransactionCategories:', error);
     toast.error('Failed to load transaction categories');
     return [];
   }
-  
-  return data.map(category => ({
-    id: category.id,
-    name: category.name,
-    type: category.type as 'income' | 'expense'
-  }));
 };

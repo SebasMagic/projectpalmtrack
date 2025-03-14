@@ -23,7 +23,11 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
   selectedType
 }) => {
   // Filter categories based on selected type
-  const filteredCategories = categories.filter(category => category.type === selectedType);
+  const filteredCategories = categories?.filter(category => category.type === selectedType) || [];
+  
+  console.log('Filtered categories:', filteredCategories);
+  console.log('Selected type:', selectedType);
+  console.log('Categories in selector:', categories);
 
   return (
     <FormField
@@ -57,27 +61,33 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
               <Command>
                 <CommandInput placeholder="Search category..." />
                 <CommandEmpty>No category found.</CommandEmpty>
-                <CommandGroup className="max-h-64 overflow-auto">
-                  {filteredCategories.map((category) => (
-                    <CommandItem
-                      value={category.name}
-                      key={category.id}
-                      onSelect={() => {
-                        form.setValue("category", category.name);
-                      }}
-                    >
-                      <Check
-                        className={cn(
-                          "mr-2 h-4 w-4",
-                          category.name === field.value
-                            ? "opacity-100"
-                            : "opacity-0"
-                        )}
-                      />
-                      {category.name}
-                    </CommandItem>
-                  ))}
-                </CommandGroup>
+                {filteredCategories && filteredCategories.length > 0 ? (
+                  <CommandGroup className="max-h-64 overflow-auto">
+                    {filteredCategories.map((category) => (
+                      <CommandItem
+                        value={category.name}
+                        key={category.id}
+                        onSelect={() => {
+                          form.setValue("category", category.name);
+                        }}
+                      >
+                        <Check
+                          className={cn(
+                            "mr-2 h-4 w-4",
+                            category.name === field.value
+                              ? "opacity-100"
+                              : "opacity-0"
+                          )}
+                        />
+                        {category.name}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                ) : (
+                  <div className="py-6 text-center text-sm">
+                    {isLoading ? "Loading..." : "No categories available"}
+                  </div>
+                )}
               </Command>
             </PopoverContent>
           </Popover>
