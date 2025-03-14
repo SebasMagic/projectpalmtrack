@@ -1,4 +1,3 @@
-
 import { DashboardStats, Project, ProjectFinancials, Transaction } from "./types";
 
 export const MOCK_PROJECTS: Project[] = [
@@ -9,6 +8,7 @@ export const MOCK_PROJECTS: Project[] = [
     location: "Malibu, CA",
     startDate: "2023-10-15",
     endDate: null,
+    dueDate: "2024-06-15",
     budget: 2500000,
     status: "active",
     completion: 45,
@@ -21,6 +21,7 @@ export const MOCK_PROJECTS: Project[] = [
     location: "San Francisco, CA",
     startDate: "2023-08-01",
     endDate: "2023-12-15",
+    dueDate: "2023-12-15",
     budget: 1200000,
     status: "completed",
     completion: 100,
@@ -33,6 +34,7 @@ export const MOCK_PROJECTS: Project[] = [
     location: "Riverside, CA",
     startDate: "2024-01-10",
     endDate: null,
+    dueDate: "2024-08-30",
     budget: 3800000,
     status: "active",
     completion: 28,
@@ -45,6 +47,7 @@ export const MOCK_PROJECTS: Project[] = [
     location: "Austin, TX",
     startDate: "2023-11-05",
     endDate: null,
+    dueDate: "2024-06-30",
     budget: 5500000,
     status: "active",
     completion: 15,
@@ -57,6 +60,7 @@ export const MOCK_PROJECTS: Project[] = [
     location: "Denver, CO",
     startDate: "2023-09-20",
     endDate: null,
+    dueDate: "2024-07-15",
     budget: 7200000,
     status: "on-hold",
     completion: 32,
@@ -69,6 +73,7 @@ export const MOCK_PROJECTS: Project[] = [
     location: "Portland, OR",
     startDate: "2024-04-01",
     endDate: null,
+    dueDate: "2025-02-28",
     budget: 4100000,
     status: "planning",
     completion: 0,
