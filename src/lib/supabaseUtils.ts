@@ -359,7 +359,7 @@ export const updateTaskStatus = async (taskId: string, status: 'todo' | 'in-prog
   // If marking as completed, set completed_at timestamp
   if (status === 'completed') {
     updateData.completed_at = new Date().toISOString();
-  } else if (status !== 'completed') {
+  } else {
     // If changing from completed to something else, clear the completed_at field
     updateData.completed_at = null;
   }

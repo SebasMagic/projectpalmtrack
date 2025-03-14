@@ -91,32 +91,65 @@ export type Database = {
       }
       tasks: {
         Row: {
+          actual_hours: number | null
+          assigned_to: string | null
+          attachments: string[] | null
+          category: string | null
+          comments: Json | null
+          completed_at: string | null
           created_at: string
+          dependencies: string[] | null
           description: string | null
           due_date: string | null
+          estimated_hours: number | null
           id: string
+          priority: string | null
           project_id: string
+          start_date: string | null
           status: string
+          tags: string[] | null
           title: string
           updated_at: string
         }
         Insert: {
+          actual_hours?: number | null
+          assigned_to?: string | null
+          attachments?: string[] | null
+          category?: string | null
+          comments?: Json | null
+          completed_at?: string | null
           created_at?: string
+          dependencies?: string[] | null
           description?: string | null
           due_date?: string | null
+          estimated_hours?: number | null
           id?: string
+          priority?: string | null
           project_id: string
+          start_date?: string | null
           status: string
+          tags?: string[] | null
           title: string
           updated_at?: string
         }
         Update: {
+          actual_hours?: number | null
+          assigned_to?: string | null
+          attachments?: string[] | null
+          category?: string | null
+          comments?: Json | null
+          completed_at?: string | null
           created_at?: string
+          dependencies?: string[] | null
           description?: string | null
           due_date?: string | null
+          estimated_hours?: number | null
           id?: string
+          priority?: string | null
           project_id?: string
+          start_date?: string | null
           status?: string
+          tags?: string[] | null
           title?: string
           updated_at?: string
         }
