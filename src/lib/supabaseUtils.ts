@@ -110,7 +110,7 @@ export const fetchProjects = async (): Promise<Project[]> => {
     location: project.location,
     startDate: project.start_date,
     endDate: project.end_date,
-    dueDate: project.due_date || null, // Handle the case when due_date might not exist in the DB
+    dueDate: null, // Since due_date doesn't exist in the database, set it to null
     budget: project.budget,
     status: project.status as 'planning' | 'active' | 'completed' | 'on-hold',
     completion: project.completion,
