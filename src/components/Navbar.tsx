@@ -41,7 +41,7 @@ const Navbar = () => {
             <img 
               src="/lovable-uploads/0a4dc2a8-06ab-4aa4-8160-732ab14f78de.png" 
               alt="OneStopShop Construction" 
-              className="h-10 md:h-12"
+              className="h-13 md:h-16" // Increased height by 30% (from h-10 to h-13 and h-12 to h-16)
             />
           </Link>
 
