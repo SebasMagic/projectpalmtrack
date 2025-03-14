@@ -96,7 +96,14 @@ const ProjectTable: React.FC<ProjectTableProps> = ({ projects, onRefresh }) => {
         <TableBody>
           {projects.map((project) => (
             <TableRow key={project.id}>
-              <TableCell className="font-medium">{project.name}</TableCell>
+              <TableCell className="font-medium">
+                <button 
+                  onClick={() => handleViewProject(project.id)}
+                  className="text-left hover:text-primary hover:underline focus:outline-none focus:text-primary transition-colors duration-200"
+                >
+                  {project.name}
+                </button>
+              </TableCell>
               <TableCell>{project.client}</TableCell>
               <TableCell>{project.location}</TableCell>
               <TableCell>{formatDate(project.startDate)}</TableCell>
