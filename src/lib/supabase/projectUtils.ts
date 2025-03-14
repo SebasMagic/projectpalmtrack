@@ -9,7 +9,7 @@ import { toast } from "sonner";
 export const fetchProjects = async (): Promise<Project[]> => {
   const { data, error } = await supabase
     .from('projects')
-    .select('*, cities(id, name, state)');
+    .select('*, cities!fk_projects_city_id(id, name, state)');
   
   if (error) {
     console.error('Error fetching projects:', error);
@@ -43,7 +43,7 @@ export const fetchProjects = async (): Promise<Project[]> => {
 export const fetchProjectById = async (projectId: string): Promise<Project | null> => {
   const { data, error } = await supabase
     .from('projects')
-    .select('*, cities(id, name, state)')
+    .select('*, cities!fk_projects_city_id(id, name, state)')
     .eq('id', projectId)
     .single();
   
