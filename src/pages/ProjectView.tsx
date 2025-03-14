@@ -1,6 +1,5 @@
-
 import { useParams, useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { getProjectById, getProjectFinancials, getProjectTransactions } from '@/lib/mockData';
 import { fetchProjectFinancials, fetchProjectTransactions, fetchProjects } from '@/lib/supabaseUtils';
 import ProjectDetail from '@/components/ProjectDetail';
@@ -19,49 +18,49 @@ const ProjectView = () => {
   const [financials, setFinancials] = useState<ProjectFinancials | undefined>(undefined);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  const loadProjectData = useCallback(async () => {
     if (!id) return;
-
-    const loadProjectData = async () => {
-      setLoading(true);
-      try {
-        // Fetch projects
-        const projects = await fetchProjects();
-        const foundProject = projects.find(p => p.id === id);
+    
+    setLoading(true);
+    try {
+      // Fetch projects
+      const projects = await fetchProjects();
+      const foundProject = projects.find(p => p.id === id);
+      
+      if (foundProject) {
+        setProject(foundProject);
         
-        if (foundProject) {
-          setProject(foundProject);
-          
-          // Fetch transactions for this project
-          const transactionData = await fetchProjectTransactions(id);
-          setTransactions(transactionData);
-          
-          // Fetch financial data for this project
-          const financialData = await fetchProjectFinancials(id);
-          if (financialData) {
-            setFinancials(financialData);
-          }
-        } else {
-          // Fall back to mock data if project not found in database
-          setProject(getProjectById(id));
-          setTransactions(getProjectTransactions(id));
-          setFinancials(getProjectFinancials(id));
-          toast.info('Using mock data for this project.');
+        // Fetch transactions for this project
+        const transactionData = await fetchProjectTransactions(id);
+        setTransactions(transactionData);
+        
+        // Fetch financial data for this project
+        const financialData = await fetchProjectFinancials(id);
+        if (financialData) {
+          setFinancials(financialData);
         }
-      } catch (error) {
-        console.error('Error loading project data:', error);
-        // Fall back to mock data
+      } else {
+        // Fall back to mock data if project not found in database
         setProject(getProjectById(id));
         setTransactions(getProjectTransactions(id));
         setFinancials(getProjectFinancials(id));
-        toast.error('Failed to load project data from database. Using mock data.');
-      } finally {
-        setLoading(false);
+        toast.info('Using mock data for this project.');
       }
-    };
-
-    loadProjectData();
+    } catch (error) {
+      console.error('Error loading project data:', error);
+      // Fall back to mock data
+      setProject(getProjectById(id));
+      setTransactions(getProjectTransactions(id));
+      setFinancials(getProjectFinancials(id));
+      toast.error('Failed to load project data from database. Using mock data.');
+    } finally {
+      setLoading(false);
+    }
   }, [id]);
+
+  useEffect(() => {
+    loadProjectData();
+  }, [loadProjectData]);
   
   useEffect(() => {
     if (!loading && !project) {

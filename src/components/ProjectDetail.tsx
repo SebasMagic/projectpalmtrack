@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { Building2, CalendarIcon, Clock, MapPin, User } from 'lucide-react';
+import { Building2, CalendarIcon, Clock, MapPin, PlusCircle, User } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -8,6 +8,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Project, Transaction, ProjectFinancials } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import PLTracker from './PLTracker';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import AddTransactionForm from './AddTransactionForm';
 
 interface ProjectDetailProps {
   project: Project;
@@ -48,6 +51,8 @@ const getStatusColor = (status: Project['status']) => {
 };
 
 const ProjectDetail = ({ project, transactions, financials }: ProjectDetailProps) => {
+  const [isAddTransactionOpen, setIsAddTransactionOpen] = useState(false);
+  
   return (
     <div className="space-y-6 animate-fade-up">
       <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
@@ -197,11 +202,23 @@ const ProjectDetail = ({ project, transactions, financials }: ProjectDetailProps
       </div>
       
       <Tabs defaultValue="finances" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="finances">Finances</TabsTrigger>
-          <TabsTrigger value="documents">Documents</TabsTrigger>
-          <TabsTrigger value="notes">Notes</TabsTrigger>
-        </TabsList>
+        <div className="flex items-center justify-between">
+          <TabsList>
+            <TabsTrigger value="finances">Finances</TabsTrigger>
+            <TabsTrigger value="documents">Documents</TabsTrigger>
+            <TabsTrigger value="notes">Notes</TabsTrigger>
+          </TabsList>
+          
+          <Button 
+            variant="default" 
+            size="sm" 
+            className="gap-1"
+            onClick={() => setIsAddTransactionOpen(true)}
+          >
+            <PlusCircle className="h-4 w-4" />
+            Add Transaction
+          </Button>
+        </div>
         
         <TabsContent value="finances">
           <PLTracker transactions={transactions} financials={financials} />
@@ -245,6 +262,26 @@ const ProjectDetail = ({ project, transactions, financials }: ProjectDetailProps
           </Card>
         </TabsContent>
       </Tabs>
+      
+      <Dialog open={isAddTransactionOpen} onOpenChange={setIsAddTransactionOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Add New Transaction</DialogTitle>
+            <DialogDescription>
+              Record a new income or expense for this project.
+            </DialogDescription>
+          </DialogHeader>
+          <AddTransactionForm 
+            projectId={project.id}
+            onSuccess={() => {
+              setIsAddTransactionOpen(false);
+              // We need to reload the page to show the new transaction
+              window.location.reload();
+            }}
+            onCancel={() => setIsAddTransactionOpen(false)}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
