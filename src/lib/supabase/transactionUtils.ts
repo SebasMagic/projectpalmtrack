@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { Transaction, TransactionCategory } from "../types";
 import { toast } from "sonner";

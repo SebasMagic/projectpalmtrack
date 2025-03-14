@@ -45,7 +45,9 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
                   disabled={isLoading}
                 >
                   {isLoading ? "Loading categories..." : 
-                    field.value ? field.value : "Select category"
+                    field.value ? 
+                      filteredCategories.find(category => category.name === field.value)?.name || field.value 
+                      : "Select category"
                   }
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
@@ -55,7 +57,7 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
               <Command>
                 <CommandInput placeholder="Search category..." />
                 <CommandEmpty>No category found.</CommandEmpty>
-                <CommandGroup>
+                <CommandGroup className="max-h-64 overflow-auto">
                   {filteredCategories.map((category) => (
                     <CommandItem
                       value={category.name}

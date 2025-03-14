@@ -59,6 +59,7 @@ export default function AddTransactionForm({
       setIsLoading(true);
       try {
         const categoriesData = await fetchTransactionCategories();
+        console.log('Fetched categories:', categoriesData);
         setCategories(categoriesData);
       } catch (error) {
         console.error('Error loading categories:', error);
@@ -73,6 +74,7 @@ export default function AddTransactionForm({
 
   async function onSubmit(values: TransactionFormValues) {
     try {
+      console.log('Submitting transaction:', values);
       const { error } = await supabase
         .from('transactions')
         .insert({
