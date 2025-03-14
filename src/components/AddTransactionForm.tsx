@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -101,7 +100,6 @@ export default function AddTransactionForm({
     }
   }
 
-  // Update available categories when type changes
   const onTypeChange = (type: 'income' | 'expense') => {
     setSelectedType(type);
     form.setValue('type', type);
@@ -123,7 +121,7 @@ export default function AddTransactionForm({
         <AmountField form={form} />
         <CategorySelector 
           form={form} 
-          categories={categories} 
+          categories={categories || []} 
           isLoading={isLoading} 
           selectedType={selectedType} 
         />

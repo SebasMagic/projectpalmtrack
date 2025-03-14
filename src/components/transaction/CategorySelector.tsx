@@ -22,14 +22,17 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
   isLoading,
   selectedType
 }) => {
-  // Ensure categories is always an array and filter by selected type
-  const filteredCategories = Array.isArray(categories) 
-    ? categories.filter(category => category.type === selectedType) 
-    : [];
+  // Ensure categories is always a valid array
+  const safeCategories = Array.isArray(categories) ? categories : [];
   
+  // Filter categories by selected type
+  const filteredCategories = safeCategories.filter(category => 
+    category && category.type === selectedType
+  );
+  
+  console.log('Safe categories:', safeCategories);
   console.log('Filtered categories:', filteredCategories);
   console.log('Selected type:', selectedType);
-  console.log('Categories in selector:', categories);
 
   return (
     <FormField
@@ -64,7 +67,7 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
                 <CommandInput placeholder="Search category..." />
                 <CommandEmpty>No category found.</CommandEmpty>
                 <CommandGroup>
-                  {Array.isArray(filteredCategories) && filteredCategories.length > 0 ? (
+                  {filteredCategories.length > 0 ? (
                     filteredCategories.map((category) => (
                       <CommandItem
                         value={category.name}
