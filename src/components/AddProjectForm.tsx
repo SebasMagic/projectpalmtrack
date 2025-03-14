@@ -179,7 +179,7 @@ const AddProjectForm = ({ onSuccess }: AddProjectFormProps) => {
                   </PopoverTrigger>
                   <PopoverContent className="w-full p-0">
                     <Command>
-                      <CommandInput placeholder="Search city..." className="h-9" icon={<Search className="h-4 w-4" />} />
+                      <CommandInput placeholder="Search city..." className="h-9" />
                       <CommandEmpty>No city found.</CommandEmpty>
                       <CommandList>
                         <CommandGroup>
