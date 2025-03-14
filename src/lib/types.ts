@@ -49,7 +49,27 @@ export interface Task {
   projectId: string;
   title: string;
   description: string | null;
-  status: 'todo' | 'in-progress' | 'completed';
+  status: 'todo' | 'in-progress' | 'completed' | 'blocked' | 'review';
+  priority: 'low' | 'medium' | 'high' | 'urgent';
   dueDate: string | null;
+  startDate: string | null;
+  estimatedHours: number | null;
+  actualHours: number | null;
+  assignedTo: string | null;
+  category: string | null;
+  tags: string[];
+  dependencies: string[] | null; // IDs of tasks this task depends on
+  attachments: string[] | null; // URLs to attachments
+  comments: TaskComment[] | null;
+  createdAt: string;
+  updatedAt: string | null;
+  completedAt: string | null;
+}
+
+export interface TaskComment {
+  id: string;
+  taskId: string;
+  content: string;
+  author: string;
   createdAt: string;
 }

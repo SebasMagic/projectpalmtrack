@@ -1,9 +1,9 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { MOCK_PROJECTS, MOCK_TRANSACTIONS } from "./mockData";
-import { Project, Transaction } from "./types";
+import { Project, Transaction, Task } from "./types";
 import { toast } from "sonner";
 import { v4 as uuidv4 } from "uuid";
-import { Task } from "@/components/TaskManager";
 
 /**
  * Migrates mock data to Supabase database
@@ -266,9 +266,21 @@ export const fetchProjectTasks = async (projectId: string): Promise<Task[]> => {
     projectId: task.project_id,
     title: task.title,
     description: task.description,
-    status: task.status as 'todo' | 'in-progress' | 'completed',
+    status: task.status as 'todo' | 'in-progress' | 'completed' | 'blocked' | 'review',
+    priority: task.priority as 'low' | 'medium' | 'high' | 'urgent' || 'medium',
     dueDate: task.due_date,
-    createdAt: task.created_at
+    startDate: task.start_date || null,
+    estimatedHours: task.estimated_hours || null,
+    actualHours: task.actual_hours || null,
+    assignedTo: task.assigned_to || null,
+    category: task.category || null,
+    tags: task.tags || [],
+    dependencies: task.dependencies || [],
+    attachments: task.attachments || [],
+    comments: task.comments || [],
+    createdAt: task.created_at,
+    updatedAt: task.updated_at || null,
+    completedAt: task.completed_at || null
   }));
 };
 
@@ -279,8 +291,16 @@ export const addProjectTask = async (taskData: {
   projectId: string, 
   title: string, 
   description?: string,
-  status: 'todo' | 'in-progress' | 'completed',
-  dueDate?: string
+  status: 'todo' | 'in-progress' | 'completed' | 'blocked' | 'review',
+  priority?: 'low' | 'medium' | 'high' | 'urgent',
+  category?: string,
+  dueDate?: string | null,
+  startDate?: string | null,
+  estimatedHours?: number | null,
+  actualHours?: number | null,
+  assignedTo?: string | null,
+  tags?: string[],
+  dependencies?: string[],
 }): Promise<Task | null> => {
   const { data, error } = await supabase
     .from('tasks')
@@ -288,8 +308,16 @@ export const addProjectTask = async (taskData: {
       project_id: taskData.projectId,
       title: taskData.title,
       description: taskData.description || null,
-      status: taskData.status,
-      due_date: taskData.dueDate || null
+      status: taskData.status || 'todo',
+      priority: taskData.priority || 'medium',
+      due_date: taskData.dueDate || null,
+      start_date: taskData.startDate || null,
+      estimated_hours: taskData.estimatedHours || null,
+      actual_hours: taskData.actualHours || null,
+      assigned_to: taskData.assignedTo || null,
+      category: taskData.category || null,
+      tags: taskData.tags || [],
+      dependencies: taskData.dependencies || []
     })
     .select()
     .single();
@@ -304,19 +332,41 @@ export const addProjectTask = async (taskData: {
     projectId: data.project_id,
     title: data.title,
     description: data.description,
-    status: data.status as 'todo' | 'in-progress' | 'completed',
+    status: data.status as 'todo' | 'in-progress' | 'completed' | 'blocked' | 'review',
+    priority: data.priority as 'low' | 'medium' | 'high' | 'urgent',
     dueDate: data.due_date,
-    createdAt: data.created_at
+    startDate: data.start_date,
+    estimatedHours: data.estimated_hours,
+    actualHours: data.actual_hours,
+    assignedTo: data.assigned_to,
+    category: data.category,
+    tags: data.tags || [],
+    dependencies: data.dependencies || [],
+    attachments: [],
+    comments: [],
+    createdAt: data.created_at,
+    updatedAt: data.updated_at,
+    completedAt: data.completed_at
   } : null;
 };
 
 /**
  * Updates a task's status
  */
-export const updateTaskStatus = async (taskId: string, status: 'todo' | 'in-progress' | 'completed'): Promise<void> => {
+export const updateTaskStatus = async (taskId: string, status: 'todo' | 'in-progress' | 'completed' | 'blocked' | 'review'): Promise<void> => {
+  const updateData: any = { status };
+  
+  // If marking as completed, set completed_at timestamp
+  if (status === 'completed') {
+    updateData.completed_at = new Date().toISOString();
+  } else if (status !== 'completed') {
+    // If changing from completed to something else, clear the completed_at field
+    updateData.completed_at = null;
+  }
+  
   const { error } = await supabase
     .from('tasks')
-    .update({ status })
+    .update(updateData)
     .eq('id', taskId);
   
   if (error) {
