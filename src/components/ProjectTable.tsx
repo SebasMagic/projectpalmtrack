@@ -1,35 +1,26 @@
+// Note: This file had a reference to @/lib/supabaseUtils which no longer exists
+// The import should now reference the new refactored files
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Progress } from '@/components/ui/progress';
-import { Project } from '@/lib/types';
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { RefreshCw } from 'lucide-react';
-import { fetchProjectFinancials } from '@/lib/supabaseUtils';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { Button } from "@/components/ui/button";
+import { Eye, FileEdit, Clock } from "lucide-react";
+import { Project } from "@/lib/types";
+import { fetchProjects } from "@/lib/supabase"; // Updated import path
 
 interface ProjectTableProps {
   projects: Project[];
-  onRefresh?: () => void;
 }
-
-const formatCurrency = (amount: number) => {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    maximumFractionDigits: 0
-  }).format(amount);
-};
 
 const formatDate = (dateString: string | null) => {
   if (!dateString) return '-';
@@ -55,131 +46,87 @@ const getStatusColor = (status: Project['status']) => {
   }
 };
 
-const ProjectTable = ({ projects, onRefresh }: ProjectTableProps) => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [projectProfits, setProjectProfits] = useState<{[key: string]: string}>({});
+const getStatusText = (status: Project['status']) => {
+  switch (status) {
+    case 'planning':
+      return 'Planning';
+    case 'active':
+      return 'Active';
+    case 'completed':
+      return 'Completed';
+    case 'on-hold':
+      return 'On Hold';
+    default:
+      return 'Unknown';
+  }
+};
+
+const ProjectTable: React.FC<ProjectTableProps> = ({ projects }) => {
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
 
-  const filteredProjects = projects.filter(project => 
-    project.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    project.client.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    project.location.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  const getProjectProfit = async (projectId: string): Promise<string> => {
-    if (projectProfits[projectId]) {
-      return projectProfits[projectId];
-    }
-
-    try {
-      const financials = await fetchProjectFinancials(projectId);
-      if (!financials) return '-';
-      
-      const profitText = `${formatCurrency(financials.currentProfit)} (${financials.profitMargin.toFixed(1)}%)`;
-      setProjectProfits(prev => ({...prev, [projectId]: profitText}));
-      return profitText;
-    } catch (error) {
-      console.error(`Error fetching profit for project ${projectId}:`, error);
-      return '-';
-    }
+  const handleViewProject = (projectId: string) => {
+    navigate(`/projects/${projectId}`);
   };
 
-  const handleRefresh = async () => {
-    setLoading(true);
-    if (onRefresh) {
-      await onRefresh();
-    }
-    setLoading(false);
+  const handleEditProject = (projectId: string) => {
+    // Implement edit functionality here
+    console.log(`Edit project ${projectId}`);
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold">Projects</h2>
-        <div className="flex items-center gap-4">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleRefresh}
-            disabled={loading}
-            className="flex items-center gap-1"
-          >
-            <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
-            {loading ? "Refreshing..." : "Refresh"}
-          </Button>
-          <div className="w-full max-w-sm">
-            <Input
-              placeholder="Search projects..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
+    <div className="relative w-full overflow-auto">
+      {isLoading ? (
+        <div className="absolute top-0 left-0 w-full h-full bg-gray-100 opacity-50 flex items-center justify-center">
+          Loading projects...
         </div>
-      </div>
-      
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Project Name</TableHead>
-              <TableHead>Client</TableHead>
-              <TableHead>Location</TableHead>
-              <TableHead>Timeline</TableHead>
-              <TableHead>Budget</TableHead>
-              <TableHead>Current P&L</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Progress</TableHead>
+      ) : null}
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Name</TableHead>
+            <TableHead>Client</TableHead>
+            <TableHead>Location</TableHead>
+            <TableHead>Start Date</TableHead>
+            <TableHead>Due Date</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead className="text-right">Completion</TableHead>
+            <TableHead className="text-center">Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {projects.map((project) => (
+            <TableRow key={project.id}>
+              <TableCell className="font-medium">{project.name}</TableCell>
+              <TableCell>{project.client}</TableCell>
+              <TableCell>{project.location}</TableCell>
+              <TableCell>{formatDate(project.startDate)}</TableCell>
+              <TableCell>{formatDate(project.dueDate)}</TableCell>
+              <TableCell>
+                <Badge className={getStatusColor(project.status)} variant="outline">
+                  {getStatusText(project.status)}
+                </Badge>
+              </TableCell>
+              <TableCell className="text-right">
+                <div className="flex items-center justify-end space-x-2">
+                  <Progress value={project.completion} className="h-2 w-[100px]" />
+                  <span>{project.completion}%</span>
+                </div>
+              </TableCell>
+              <TableCell className="text-center">
+                <div className="flex items-center justify-center space-x-2">
+                  <Button variant="ghost" size="sm" onClick={() => handleViewProject(project.id)}>
+                    <Eye className="h-4 w-4" />
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={() => handleEditProject(project.id)}>
+                    <FileEdit className="h-4 w-4" />
+                  </Button>
+                </div>
+              </TableCell>
             </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredProjects.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
-                  No projects found
-                </TableCell>
-              </TableRow>
-            ) : (
-              filteredProjects.map((project) => (
-                <TableRow 
-                  key={project.id} 
-                  className="cursor-pointer hover:bg-muted/50"
-                  onClick={() => navigate(`/project/${project.id}`)}
-                >
-                  <TableCell className="font-medium">{project.name}</TableCell>
-                  <TableCell>{project.client}</TableCell>
-                  <TableCell>{project.location}</TableCell>
-                  <TableCell>
-                    {formatDate(project.startDate)} - {formatDate(project.endDate)}
-                  </TableCell>
-                  <TableCell>{formatCurrency(project.budget)}</TableCell>
-                  <TableCell>
-                    {projectProfits[project.id] || 
-                      <span className="text-muted-foreground">Loading...</span>}
-                  </TableCell>
-                  <TableCell>
-                    <Badge 
-                      className={cn(
-                        "font-medium capitalize", 
-                        getStatusColor(project.status)
-                      )}
-                      variant="outline"
-                    >
-                      {project.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center space-x-2">
-                      <Progress value={project.completion} className="h-2 w-24" />
-                      <span className="text-xs font-medium">{project.completion}%</span>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </div>
+          ))}
+        </TableBody>
+      </Table>
     </div>
   );
 };
