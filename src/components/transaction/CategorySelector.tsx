@@ -59,12 +59,12 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
                 </Button>
               </FormControl>
             </PopoverTrigger>
-            <PopoverContent className="w-full p-0 bg-popover" align="start" side="bottom" sideOffset={4}>
+            <PopoverContent className="w-[250px] p-0" align="start" side="bottom">
               <Command>
                 <CommandInput placeholder="Search category..." />
                 <CommandEmpty>No category found.</CommandEmpty>
-                <CommandGroup className="max-h-64 overflow-auto">
-                  {filteredCategories.length > 0 ? (
+                <CommandGroup>
+                  {filteredCategories && filteredCategories.length > 0 ? (
                     filteredCategories.map((category) => (
                       <CommandItem
                         value={category.name}
@@ -85,7 +85,7 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
                       </CommandItem>
                     ))
                   ) : (
-                    <CommandItem disabled className="py-2 text-center text-sm opacity-70">
+                    <CommandItem disabled>
                       No {selectedType} categories available
                     </CommandItem>
                   )}
