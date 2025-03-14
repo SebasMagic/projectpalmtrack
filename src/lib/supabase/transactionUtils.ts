@@ -92,7 +92,7 @@ export const fetchTransactionCategories = async (): Promise<TransactionCategory[
     const { data, error } = await supabase
       .from('transaction_categories')
       .select('*')
-      .order('name');
+      .order('Category');
     
     if (error) {
       console.error('Error fetching transaction categories:', error);
@@ -109,7 +109,7 @@ export const fetchTransactionCategories = async (): Promise<TransactionCategory[
     
     return data.map(category => ({
       id: category.id,
-      name: category.name,
+      name: category.Category, // Fix here: map 'Category' from DB to 'name' in our app
       type: category.type as 'income' | 'expense'
     }));
   } catch (error) {
