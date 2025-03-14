@@ -3,6 +3,7 @@ import { MOCK_PROJECTS, MOCK_TRANSACTIONS } from "./mockData";
 import { Project, Transaction } from "./types";
 import { toast } from "sonner";
 import { v4 as uuidv4 } from "uuid";
+import { Task } from "@/components/TaskManager";
 
 /**
  * Migrates mock data to Supabase database
@@ -84,8 +85,6 @@ export const migrateDataToSupabase = async () => {
     return { success: false, message: `Error in data migration: ${error}` };
   }
 };
-
-// Utility functions to fetch data from Supabase
 
 /**
  * Fetches all projects from Supabase
@@ -244,4 +243,84 @@ export const fetchDashboardStats = async () => {
     totalProfit,
     upcomingDeadlines: upcomingDeadlines || [] // Ensure we always return an array, even if empty
   };
+};
+
+/**
+ * Fetches tasks for a specific project
+ */
+export const fetchProjectTasks = async (projectId: string): Promise<Task[]> => {
+  const { data, error } = await supabase
+    .from('tasks')
+    .select('*')
+    .eq('project_id', projectId)
+    .order('created_at', { ascending: false });
+  
+  if (error) {
+    console.error('Error fetching tasks:', error);
+    toast.error('Failed to load tasks');
+    return [];
+  }
+  
+  return data.map(task => ({
+    id: task.id,
+    projectId: task.project_id,
+    title: task.title,
+    description: task.description,
+    status: task.status as 'todo' | 'in-progress' | 'completed',
+    dueDate: task.due_date,
+    createdAt: task.created_at
+  }));
+};
+
+/**
+ * Adds a new task to a project
+ */
+export const addProjectTask = async (taskData: { 
+  projectId: string, 
+  title: string, 
+  description?: string,
+  status: 'todo' | 'in-progress' | 'completed',
+  dueDate?: string
+}): Promise<Task | null> => {
+  const { data, error } = await supabase
+    .from('tasks')
+    .insert({
+      project_id: taskData.projectId,
+      title: taskData.title,
+      description: taskData.description || null,
+      status: taskData.status,
+      due_date: taskData.dueDate || null
+    })
+    .select()
+    .single();
+  
+  if (error) {
+    console.error('Error adding task:', error);
+    throw error;
+  }
+  
+  return data ? {
+    id: data.id,
+    projectId: data.project_id,
+    title: data.title,
+    description: data.description,
+    status: data.status as 'todo' | 'in-progress' | 'completed',
+    dueDate: data.due_date,
+    createdAt: data.created_at
+  } : null;
+};
+
+/**
+ * Updates a task's status
+ */
+export const updateTaskStatus = async (taskId: string, status: 'todo' | 'in-progress' | 'completed'): Promise<void> => {
+  const { error } = await supabase
+    .from('tasks')
+    .update({ status })
+    .eq('id', taskId);
+  
+  if (error) {
+    console.error('Error updating task:', error);
+    throw error;
+  }
 };

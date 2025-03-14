@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Card,
@@ -24,6 +23,7 @@ import PLTracker from '@/components/PLTracker';
 import { cn } from "@/lib/utils";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PerformanceTracker from "@/components/PerformanceTracker";
+import TaskManager from '@/components/TaskManager';
 
 interface ProjectDetailProps {
   project: Project;
@@ -135,8 +135,9 @@ const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, transactions, fi
       </div>
       
       <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="w-full grid grid-cols-2">
+        <TabsList className="w-full grid grid-cols-3">
           <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="tasks">Tasks</TabsTrigger>
           <TabsTrigger value="performance">Performance</TabsTrigger>
         </TabsList>
         
@@ -224,6 +225,10 @@ const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, transactions, fi
               <TransactionTable transactions={transactions} />
             </CardContent>
           </Card>
+        </TabsContent>
+        
+        <TabsContent value="tasks">
+          <TaskManager projectId={project.id} />
         </TabsContent>
         
         <TabsContent value="performance">
