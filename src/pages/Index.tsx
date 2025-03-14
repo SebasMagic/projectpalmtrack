@@ -4,7 +4,7 @@ import { MOCK_DASHBOARD_STATS, MOCK_PROJECTS } from '@/lib/mockData';
 import Dashboard from '@/components/Dashboard';
 import Navbar from '@/components/Navbar';
 import { DashboardStats, Project } from '@/lib/types';
-import { fetchDashboardStats, fetchProjects } from '@/lib/supabaseUtils';
+import { fetchDashboardStats, fetchProjects } from '@/lib/supabase';
 import { toast } from 'sonner';
 
 const Index = () => {

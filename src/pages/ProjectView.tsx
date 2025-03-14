@@ -2,7 +2,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useEffect, useState, useCallback } from 'react';
 import { getProjectById, getProjectFinancials, getProjectTransactions } from '@/lib/mockData';
-import { fetchProjectFinancials, fetchProjectTransactions, fetchProjects } from '@/lib/supabaseUtils';
+import { fetchProjectFinancials, fetchProjectTransactions, fetchProjects } from '@/lib/supabase';
 import ProjectDetail from '@/components/ProjectDetail';
 import Navbar from '@/components/Navbar';
 import { Button } from '@/components/ui/button';

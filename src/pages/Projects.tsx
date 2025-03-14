@@ -5,7 +5,7 @@ import { MOCK_PROJECTS } from '@/lib/mockData';
 import ProjectTable from '@/components/ProjectTable';
 import Navbar from '@/components/Navbar';
 import { Project } from '@/lib/types';
-import { fetchProjects, migrateDataToSupabase } from '@/lib/supabaseUtils';
+import { fetchProjects, migrateDataToSupabase } from '@/lib/supabase';
 import { toast } from 'sonner';
 import { Plus, Calendar, List } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";

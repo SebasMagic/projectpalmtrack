@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 import { CalendarCheck, AlertTriangle, Check, Clock, FileText } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { fetchProjectTasks } from '@/lib/supabaseUtils';
+import { fetchProjectTasks } from '@/lib/supabase';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface GanttChartProps {

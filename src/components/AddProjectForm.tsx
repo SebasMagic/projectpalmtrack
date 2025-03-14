@@ -15,7 +15,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { supabase } from "@/integrations/supabase/client";
-import { fetchCities } from "@/lib/supabaseUtils";
+import { fetchCities } from "@/lib/supabase";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 
