@@ -4,7 +4,6 @@
 
 export * from './dataUtils';
 export * from './projectUtils';
-export * from './transactionUtils';
 export * from './dashboardUtils';
 export * from './taskUtils';
 export * from './migrationUtils';

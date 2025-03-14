@@ -3,25 +3,19 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Project, Transaction, ProjectFinancials } from '@/lib/types';
+import { Project, ProjectFinancials } from '@/lib/types';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Clock, AlertTriangle, TrendingUp, Calendar } from 'lucide-react';
 
 interface PerformanceTrackerProps {
   project: Project;
-  transactions: Transaction[];
   financials: ProjectFinancials;
 }
 
 interface ProgressPoint {
   date: string;
   completion: number;
-}
-
-interface ExpenseBreakdown {
-  name: string;
-  value: number;
 }
 
 const formatCurrency = (amount: number) => {
@@ -32,9 +26,8 @@ const formatCurrency = (amount: number) => {
   }).format(amount);
 };
 
-const PerformanceTracker = ({ project, transactions, financials }: PerformanceTrackerProps) => {
+const PerformanceTracker = ({ project, financials }: PerformanceTrackerProps) => {
   const [progressData, setProgressData] = useState<ProgressPoint[]>([]);
-  const [expenseBreakdown, setExpenseBreakdown] = useState<ExpenseBreakdown[]>([]);
   
   useEffect(() => {
     // Generate sample progress data (this would normally come from a database)
@@ -66,25 +59,7 @@ const PerformanceTracker = ({ project, transactions, financials }: PerformanceTr
     }
     
     setProgressData(points);
-    
-    // Calculate expense breakdown by category
-    const expensesByCategory: {[key: string]: number} = {};
-    transactions
-      .filter(t => t.type === 'expense')
-      .forEach(transaction => {
-        if (!expensesByCategory[transaction.category]) {
-          expensesByCategory[transaction.category] = 0;
-        }
-        expensesByCategory[transaction.category] += transaction.amount;
-      });
-    
-    const breakdownData = Object.entries(expensesByCategory).map(([name, value]) => ({
-      name,
-      value
-    }));
-    
-    setExpenseBreakdown(breakdownData);
-  }, [project, transactions]);
+  }, [project]);
   
   // Calculate days left
   const daysLeft = project.endDate 
@@ -156,7 +131,7 @@ const PerformanceTracker = ({ project, transactions, financials }: PerformanceTr
         </Card>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
         <Card>
           <CardHeader>
             <CardTitle>Construction Progress Tracking</CardTitle>
@@ -173,32 +148,6 @@ const PerformanceTracker = ({ project, transactions, financials }: PerformanceTr
                 <Tooltip formatter={(value) => [`${value}%`, 'Completion']} />
                 <Line type="monotone" dataKey="completion" stroke="#3b82f6" strokeWidth={2} />
               </LineChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader>
-            <CardTitle>Expense Breakdown by Category</CardTitle>
-          </CardHeader>
-          <CardContent className="h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                data={expenseBreakdown}
-                margin={{ top: 5, right: 30, left: 20, bottom: 50 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis 
-                  dataKey="name" 
-                  angle={-45} 
-                  textAnchor="end" 
-                  height={70} 
-                  tick={{ fontSize: 12 }} 
-                />
-                <YAxis />
-                <Tooltip formatter={(value) => [formatCurrency(value as number), 'Amount']} />
-                <Bar dataKey="value" fill="#3b82f6" />
-              </BarChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>

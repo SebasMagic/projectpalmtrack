@@ -1,4 +1,5 @@
-import { DashboardStats, Project, ProjectFinancials, Transaction } from "./types";
+
+import { DashboardStats, Project, ProjectFinancials } from "./types";
 
 export const MOCK_PROJECTS: Project[] = [
   {
@@ -81,149 +82,6 @@ export const MOCK_PROJECTS: Project[] = [
   }
 ];
 
-export const MOCK_TRANSACTIONS: Transaction[] = [
-  // Coastal Heights Transactions
-  {
-    id: "t1",
-    projectId: "p1",
-    date: "2023-10-15",
-    amount: 500000,
-    type: "income",
-    category: "Deposit",
-    description: "Initial project deposit"
-  },
-  {
-    id: "t2",
-    projectId: "p1",
-    date: "2023-10-20",
-    amount: 120000,
-    type: "expense",
-    category: "Materials",
-    description: "Foundation materials"
-  },
-  {
-    id: "t3",
-    projectId: "p1",
-    date: "2023-11-05",
-    amount: 85000,
-    type: "expense",
-    category: "Labor",
-    description: "Foundation work crew"
-  },
-  {
-    id: "t4",
-    projectId: "p1",
-    date: "2023-12-10",
-    amount: 750000,
-    type: "income",
-    category: "Milestone",
-    description: "Completion of foundation phase"
-  },
-  {
-    id: "t5",
-    projectId: "p1",
-    date: "2023-12-15",
-    amount: 230000,
-    type: "expense",
-    category: "Materials",
-    description: "Framing materials"
-  },
-  
-  // Downtown Office Renovation
-  {
-    id: "t6",
-    projectId: "p2",
-    date: "2023-08-01",
-    amount: 300000,
-    type: "income",
-    category: "Deposit",
-    description: "Initial project deposit"
-  },
-  {
-    id: "t7",
-    projectId: "p2",
-    date: "2023-08-10",
-    amount: 45000,
-    type: "expense",
-    category: "Demolition",
-    description: "Interior demolition"
-  },
-  {
-    id: "t8",
-    projectId: "p2",
-    date: "2023-09-05",
-    amount: 400000,
-    type: "income",
-    category: "Milestone",
-    description: "Demolition completion"
-  },
-  {
-    id: "t9",
-    projectId: "p2",
-    date: "2023-09-15",
-    amount: 180000,
-    type: "expense",
-    category: "Materials",
-    description: "Framing and drywall"
-  },
-  {
-    id: "t10",
-    projectId: "p2",
-    date: "2023-10-20",
-    amount: 500000,
-    type: "income",
-    category: "Milestone",
-    description: "Framing completion"
-  },
-  {
-    id: "t11",
-    projectId: "p2",
-    date: "2023-11-15",
-    amount: 210000,
-    type: "expense",
-    category: "Finishes",
-    description: "Interior finishes and fixtures"
-  },
-  {
-    id: "t12",
-    projectId: "p2",
-    date: "2023-12-15",
-    amount: 100000,
-    type: "expense",
-    category: "Final",
-    description: "Final touches and cleanup"
-  },
-  
-  // Riverside Community Center
-  {
-    id: "t13",
-    projectId: "p3",
-    date: "2024-01-10",
-    amount: 950000,
-    type: "income",
-    category: "Deposit",
-    description: "Initial project deposit"
-  },
-  {
-    id: "t14",
-    projectId: "p3",
-    date: "2024-01-20",
-    amount: 320000,
-    type: "expense",
-    category: "Site Prep",
-    description: "Site preparation and excavation"
-  },
-  {
-    id: "t15",
-    projectId: "p3",
-    date: "2024-02-15",
-    amount: 190000,
-    type: "expense",
-    category: "Materials",
-    description: "Foundation materials"
-  }
-];
-
 export const MOCK_PROJECT_FINANCIALS: ProjectFinancials[] = [
   {
     projectId: "p1",
@@ -292,11 +150,6 @@ export const MOCK_DASHBOARD_STATS: DashboardStats = {
       dueDate: "2024-07-15"
     }
   ]
-};
-
-// Helper function to get transactions for a specific project
-export const getProjectTransactions = (projectId: string): Transaction[] => {
-  return MOCK_TRANSACTIONS.filter(transaction => transaction.projectId === projectId);
 };
 
 // Helper function to get project details by ID

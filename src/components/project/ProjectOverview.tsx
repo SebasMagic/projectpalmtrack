@@ -2,18 +2,13 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Button } from "@/components/ui/button";
-import { PlusCircle, Coins, BarChart3, Percent, CheckCircle } from "lucide-react";
-import { Project, Transaction, ProjectFinancials } from '@/lib/types';
-import TransactionTable from '@/components/TransactionTable';
+import { Coins, BarChart3, Percent, CheckCircle } from "lucide-react";
+import { Project, ProjectFinancials } from '@/lib/types';
 import StatCard from './StatCard';
-import PLTracker from '@/components/PLTracker';
 
 interface ProjectOverviewProps {
   project: Project;
-  transactions: Transaction[];
   financials: ProjectFinancials;
-  onAddTransactionClick: () => void;
 }
 
 const formatDate = (dateString: string | null) => {
@@ -35,12 +30,8 @@ const formatCurrency = (amount: number) => {
 
 const ProjectOverview: React.FC<ProjectOverviewProps> = ({
   project,
-  transactions,
-  financials,
-  onAddTransactionClick
+  financials
 }) => {
-  console.log("ProjectOverview received transactions:", transactions?.length || 0); // Debug logging
-  
   return <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard title="Total Budget" value={formatCurrency(financials.totalBudget)} icon={<Coins className="h-4 w-4 text-muted-foreground" />} />
@@ -82,29 +73,41 @@ const ProjectOverview: React.FC<ProjectOverviewProps> = ({
             <CardTitle>Financial Summary</CardTitle>
           </CardHeader>
           <CardContent>
-            <PLTracker transactions={transactions} financials={financials} />
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <h3 className="text-sm font-medium text-muted-foreground">Budget</h3>
+                  <p className="font-medium">{formatCurrency(financials.totalBudget)}</p>
+                </div>
+                <div>
+                  <h3 className="text-sm font-medium text-muted-foreground">Total Income</h3>
+                  <p className="font-medium text-green-600">{formatCurrency(financials.totalIncome)}</p>
+                </div>
+                <div>
+                  <h3 className="text-sm font-medium text-muted-foreground">Total Expenses</h3>
+                  <p className="font-medium text-red-600">{formatCurrency(financials.totalExpenses)}</p>
+                </div>
+                <div>
+                  <h3 className="text-sm font-medium text-muted-foreground">Current Profit</h3>
+                  <p className={`font-medium ${financials.currentProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    {formatCurrency(financials.currentProfit)}
+                  </p>
+                </div>
+              </div>
+              <div>
+                <h3 className="text-sm font-medium mb-2">Profit Margin</h3>
+                <div className="flex items-center gap-2">
+                  <Progress 
+                    value={Math.max(0, Math.min(100, financials.profitMargin))} 
+                    className={`h-2 flex-1 ${financials.profitMargin < 0 ? 'bg-red-600' : ''}`} 
+                  />
+                  <span className="text-xs font-medium">{financials.profitMargin.toFixed(1)}%</span>
+                </div>
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>
-      
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0">
-          <CardTitle>Transactions</CardTitle>
-          <Button variant="outline" size="sm" onClick={onAddTransactionClick}>
-            <PlusCircle className="mr-1 h-4 w-4" />
-            Add Transaction
-          </Button>
-        </CardHeader>
-        <CardContent>
-          {transactions && transactions.length > 0 ? (
-            <TransactionTable transactions={transactions} />
-          ) : (
-            <div className="text-center py-8 text-muted-foreground">
-              No transactions found. Click 'Add Transaction' to create one.
-            </div>
-          )}
-        </CardContent>
-      </Card>
     </div>;
 };
 

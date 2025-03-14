@@ -1,14 +1,14 @@
 
 import { useParams, useNavigate } from 'react-router-dom';
 import { useEffect, useState, useCallback } from 'react';
-import { getProjectById, getProjectFinancials, getProjectTransactions } from '@/lib/mockData';
-import { fetchProjectFinancials, fetchProjectTransactions } from '@/lib/supabase';
-import { supabase } from '@/integrations/supabase/client'; // Add this import
+import { getProjectById } from '@/lib/mockData';
+import { fetchProjectFinancials } from '@/lib/supabase';
+import { supabase } from '@/integrations/supabase/client';
 import ProjectDetail from '@/components/ProjectDetail';
 import Navbar from '@/components/Navbar';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, RefreshCw } from 'lucide-react';
-import { Project, ProjectFinancials, Transaction } from '@/lib/types';
+import { Project, ProjectFinancials } from '@/lib/types';
 import { toast } from 'sonner';
 
 const ProjectView = () => {
@@ -16,7 +16,6 @@ const ProjectView = () => {
   const navigate = useNavigate();
   
   const [project, setProject] = useState<Project | undefined>(undefined);
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [financials, setFinancials] = useState<ProjectFinancials | undefined>(undefined);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -60,11 +59,6 @@ const ProjectView = () => {
         
         setProject(formattedProject);
         
-        // Fetch transactions for this project
-        const transactionData = await fetchProjectTransactions(id);
-        console.log("Fetched transactions:", transactionData.length);
-        setTransactions(transactionData);
-        
         // Fetch financial data for this project
         const financialData = await fetchProjectFinancials(id);
         if (financialData) {
@@ -75,16 +69,12 @@ const ProjectView = () => {
         console.warn("Project not found in database, falling back to mock data");
         // Fall back to mock data if project not found in database
         setProject(getProjectById(id));
-        setTransactions(getProjectTransactions(id));
-        setFinancials(getProjectFinancials(id));
         toast.info('Using mock data for this project.');
       }
     } catch (error) {
       console.error('Error loading project data:', error);
       // Fall back to mock data
       setProject(getProjectById(id));
-      setTransactions(getProjectTransactions(id));
-      setFinancials(getProjectFinancials(id));
       toast.error('Failed to load project data from database. Using mock data.');
     } finally {
       setLoading(false);
@@ -155,7 +145,6 @@ const ProjectView = () => {
   }
   
   console.log("Rendering ProjectView with project:", project.name);
-  console.log("Transactions to be displayed:", transactions.length);
   
   return (
     <div className="min-h-screen bg-background">
@@ -186,9 +175,7 @@ const ProjectView = () => {
         
         <ProjectDetail 
           project={project} 
-          transactions={transactions} 
           financials={financials} 
-          onTransactionAdded={loadProjectData}
         />
       </main>
     </div>

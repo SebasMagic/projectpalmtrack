@@ -14,22 +14,6 @@ export interface Project {
   description: string;
 }
 
-export interface Transaction {
-  id: string;
-  projectId: string;
-  date: string;
-  amount: number;
-  type: 'income' | 'expense';
-  category: string;
-  description: string;
-}
-
-export interface TransactionCategory {
-  id: string;
-  name: string;
-  type: 'income' | 'expense';
-}
-
 export interface ProjectFinancials {
   projectId: string;
   totalBudget: number;
