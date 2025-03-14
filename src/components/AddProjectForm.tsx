@@ -26,6 +26,7 @@ const projectSchema = z.object({
     required_error: "Start date is required",
   }),
   endDate: z.date().optional(),
+  dueDate: z.date().optional(),
   status: z.enum(["planning", "active", "on-hold", "completed"]),
   completion: z.coerce.number().min(0).max(100).default(0),
 });
@@ -62,6 +63,7 @@ const AddProjectForm = ({ onSuccess }: AddProjectFormProps) => {
         budget: values.budget,
         start_date: format(values.startDate, "yyyy-MM-dd"),
         end_date: values.endDate ? format(values.endDate, "yyyy-MM-dd") : null,
+        due_date: values.dueDate ? format(values.dueDate, "yyyy-MM-dd") : null,
         status: values.status,
         completion: values.completion,
       };
@@ -146,7 +148,7 @@ const AddProjectForm = ({ onSuccess }: AddProjectFormProps) => {
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <FormField
             control={form.control}
             name="startDate"
@@ -180,10 +182,41 @@ const AddProjectForm = ({ onSuccess }: AddProjectFormProps) => {
           />
           <FormField
             control={form.control}
+            name="dueDate"
+            render={({ field }) => (
+              <FormItem className="flex flex-col">
+                <FormLabel>Due Date (Required)</FormLabel>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        variant="outline"
+                        className={`w-full justify-start text-left font-normal ${!field.value && "text-muted-foreground"}`}
+                      >
+                        <Calendar className="mr-2 h-4 w-4" />
+                        {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <CalendarComponent
+                      mode="single"
+                      selected={field.value ?? undefined}
+                      onSelect={field.onChange}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
             name="endDate"
             render={({ field }) => (
               <FormItem className="flex flex-col">
-                <FormLabel>End Date (Optional)</FormLabel>
+                <FormLabel>Actual End Date (Optional)</FormLabel>
                 <Popover>
                   <PopoverTrigger asChild>
                     <FormControl>

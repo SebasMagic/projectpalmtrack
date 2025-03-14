@@ -6,6 +6,7 @@ export interface Project {
   location: string;
   startDate: string;
   endDate: string | null;
+  dueDate: string | null;
   budget: number;
   status: 'planning' | 'active' | 'completed' | 'on-hold';
   completion: number; // percentage

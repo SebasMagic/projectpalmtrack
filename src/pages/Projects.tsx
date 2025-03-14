@@ -7,15 +7,18 @@ import Navbar from '@/components/Navbar';
 import { Project } from '@/lib/types';
 import { fetchProjects, migrateDataToSupabase } from '@/lib/supabaseUtils';
 import { toast } from 'sonner';
-import { Plus } from 'lucide-react';
+import { Plus, Calendar, List } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import AddProjectForm from '@/components/AddProjectForm';
+import GanttChart from '@/components/GanttChart';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Projects = () => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [migrating, setMigrating] = useState(false);
   const [isAddProjectOpen, setIsAddProjectOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<'table' | 'gantt'>('table');
 
   useEffect(() => {
     loadProjects();
@@ -82,7 +85,31 @@ const Projects = () => {
             </Button>
           </div>
         </div>
-        <ProjectTable projects={projects} onRefresh={loadProjects} />
+        
+        <div className="mb-6">
+          <Tabs value={viewMode} onValueChange={(value) => setViewMode(value as 'table' | 'gantt')}>
+            <div className="flex justify-between items-center">
+              <TabsList>
+                <TabsTrigger value="table" className="flex items-center gap-1">
+                  <List size={16} />
+                  List View
+                </TabsTrigger>
+                <TabsTrigger value="gantt" className="flex items-center gap-1">
+                  <Calendar size={16} />
+                  Gantt View
+                </TabsTrigger>
+              </TabsList>
+            </div>
+            
+            <TabsContent value="table" className="mt-6">
+              <ProjectTable projects={projects} onRefresh={loadProjects} />
+            </TabsContent>
+            
+            <TabsContent value="gantt" className="mt-6">
+              <GanttChart projects={projects} />
+            </TabsContent>
+          </Tabs>
+        </div>
 
         <Dialog open={isAddProjectOpen} onOpenChange={setIsAddProjectOpen}>
           <DialogContent className="sm:max-w-[600px]">
