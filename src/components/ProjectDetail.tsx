@@ -1,11 +1,18 @@
 
 import React, { useState } from 'react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Project, Transaction, ProjectFinancials } from '@/lib/types';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PerformanceTracker from "@/components/PerformanceTracker";
 import ProjectHeader from './project/ProjectHeader';
 import ProjectOverview from './project/ProjectOverview';
 import ProjectTasksView from './project/ProjectTasksView';
+import TransactionForm from './TransactionForm';
 
 interface ProjectDetailProps {
   project: Project;
@@ -15,9 +22,19 @@ interface ProjectDetailProps {
 }
 
 const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, transactions, financials, onTransactionAdded }) => {
+  const [isAddTransactionOpen, setIsAddTransactionOpen] = useState(false);
+
   const handleAddTransactionClick = () => {
-    // This function will be rebuilt later
-    console.log("Add transaction button clicked - functionality removed");
+    setIsAddTransactionOpen(true);
+  };
+
+  const handleTransactionSuccess = () => {
+    setIsAddTransactionOpen(false);
+    onTransactionAdded?.();
+  };
+
+  const handleTransactionCancel = () => {
+    setIsAddTransactionOpen(false);
   };
 
   console.log("Rendering ProjectDetail with project ID:", project.id);
@@ -50,6 +67,19 @@ const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, transactions, fi
           <PerformanceTracker project={project} transactions={transactions} financials={financials} />
         </TabsContent>
       </Tabs>
+      
+      <Dialog open={isAddTransactionOpen} onOpenChange={setIsAddTransactionOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Add Transaction</DialogTitle>
+          </DialogHeader>
+          <TransactionForm 
+            projectId={project.id} 
+            onSuccess={handleTransactionSuccess} 
+            onCancel={handleTransactionCancel}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

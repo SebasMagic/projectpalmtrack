@@ -88,9 +88,9 @@ const ProjectOverview: React.FC<ProjectOverviewProps> = ({
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
           <CardTitle>Transactions</CardTitle>
-          <Button variant="outline" size="sm" onClick={onAddTransactionClick} disabled>
+          <Button variant="outline" size="sm" onClick={onAddTransactionClick}>
             <PlusCircle className="mr-1 h-4 w-4" />
-            Add Transaction (Disabled)
+            Add Transaction
           </Button>
         </CardHeader>
         <CardContent>
