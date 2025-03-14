@@ -243,6 +243,12 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_transaction_categories: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          category_count: number
+        }[]
+      }
       get_project_financials: {
         Args: {
           project_id: string
