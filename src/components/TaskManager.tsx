@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import {
   Table,
@@ -35,7 +36,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { cn } from "@/lib/utils";
 
 import { Task } from "@/lib/types";
-import { fetchProjectTasks } from "@/lib/supabase"; // Updated import path
+import { fetchProjectTasks, addProjectTask } from "@/lib/supabase"; // Updated import path
 
 interface TaskManagerProps {
   projectId: string;

@@ -20,6 +20,7 @@ import { fetchProjects } from "@/lib/supabase"; // Updated import path
 
 interface ProjectTableProps {
   projects: Project[];
+  onRefresh?: () => Promise<void>; // Added optional onRefresh prop
 }
 
 const formatDate = (dateString: string | null) => {
@@ -61,7 +62,7 @@ const getStatusText = (status: Project['status']) => {
   }
 };
 
-const ProjectTable: React.FC<ProjectTableProps> = ({ projects }) => {
+const ProjectTable: React.FC<ProjectTableProps> = ({ projects, onRefresh }) => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
 
