@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { MOCK_PROJECTS, MOCK_TRANSACTIONS } from "./mockData";
 import { Project, Transaction } from "./types";
 import { toast } from "sonner";
+import { v4 as uuidv4 } from "uuid";
 
 /**
  * Migrates mock data to Supabase database
@@ -21,19 +22,27 @@ export const migrateDataToSupabase = async () => {
       return { success: true, message: 'Data already exists in Supabase' };
     }
 
-    // Prepare projects for insertion
-    const projectsToInsert = MOCK_PROJECTS.map(project => ({
-      id: project.id,
-      name: project.name,
-      client: project.client,
-      location: project.location,
-      start_date: project.startDate,
-      end_date: project.endDate,
-      budget: project.budget,
-      status: project.status,
-      completion: project.completion,
-      description: project.description
-    }));
+    // Create a mapping of old project IDs to new UUIDs
+    const projectIdMap = new Map();
+    
+    // Prepare projects for insertion with proper UUIDs
+    const projectsToInsert = MOCK_PROJECTS.map(project => {
+      const newId = uuidv4();
+      projectIdMap.set(project.id, newId);
+      
+      return {
+        id: newId,
+        name: project.name,
+        client: project.client,
+        location: project.location,
+        start_date: project.startDate,
+        end_date: project.endDate,
+        budget: project.budget,
+        status: project.status,
+        completion: project.completion,
+        description: project.description
+      };
+    });
 
     // Insert projects
     const { error: projectsError } = await supabase
@@ -45,10 +54,10 @@ export const migrateDataToSupabase = async () => {
       return { success: false, message: `Error inserting projects: ${projectsError.message}` };
     }
 
-    // Prepare transactions for insertion
+    // Prepare transactions for insertion with proper UUIDs and updated project references
     const transactionsToInsert = MOCK_TRANSACTIONS.map(transaction => ({
-      id: transaction.id,
-      project_id: transaction.projectId,
+      id: uuidv4(),
+      project_id: projectIdMap.get(transaction.projectId), // Use the new UUID for the project
       date: transaction.date,
       amount: transaction.amount,
       type: transaction.type,
