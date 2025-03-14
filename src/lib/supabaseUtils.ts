@@ -1,7 +1,7 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { MOCK_PROJECTS, MOCK_TRANSACTIONS } from "./mockData";
-import { Project, Transaction, Task } from "./types";
+import { Project, Transaction, Task, TaskComment } from "./types";
 import { toast } from "sonner";
 import { v4 as uuidv4 } from "uuid";
 
@@ -261,27 +261,52 @@ export const fetchProjectTasks = async (projectId: string): Promise<Task[]> => {
     return [];
   }
   
-  return data.map(task => ({
-    id: task.id,
-    projectId: task.project_id,
-    title: task.title,
-    description: task.description,
-    status: task.status as 'todo' | 'in-progress' | 'completed' | 'blocked' | 'review',
-    priority: task.priority as 'low' | 'medium' | 'high' | 'urgent' || 'medium',
-    dueDate: task.due_date,
-    startDate: task.start_date || null,
-    estimatedHours: task.estimated_hours || null,
-    actualHours: task.actual_hours || null,
-    assignedTo: task.assigned_to || null,
-    category: task.category || null,
-    tags: task.tags || [],
-    dependencies: task.dependencies || [],
-    attachments: task.attachments || [],
-    comments: task.comments || [],
-    createdAt: task.created_at,
-    updatedAt: task.updated_at || null,
-    completedAt: task.completed_at || null
-  }));
+  return data.map(task => {
+    // Parse comments to ensure they are properly cast to TaskComment[]
+    let parsedComments: TaskComment[] = [];
+    
+    if (task.comments) {
+      try {
+        // If comments is already an array, map it to TaskComment structure
+        if (Array.isArray(task.comments)) {
+          parsedComments = task.comments.map((comment: any) => ({
+            id: comment.id || uuidv4(),
+            taskId: comment.taskId || task.id,
+            content: comment.content || '',
+            author: comment.author || 'Unknown',
+            createdAt: comment.createdAt || new Date().toISOString()
+          }));
+        } else {
+          // If it's not an array, use empty array
+          console.warn('Task comments not in expected format:', task.comments);
+        }
+      } catch (e) {
+        console.error('Error parsing task comments:', e);
+      }
+    }
+    
+    return {
+      id: task.id,
+      projectId: task.project_id,
+      title: task.title,
+      description: task.description,
+      status: task.status as 'todo' | 'in-progress' | 'completed' | 'blocked' | 'review',
+      priority: task.priority as 'low' | 'medium' | 'high' | 'urgent' || 'medium',
+      dueDate: task.due_date,
+      startDate: task.start_date || null,
+      estimatedHours: task.estimated_hours || null,
+      actualHours: task.actual_hours || null,
+      assignedTo: task.assigned_to || null,
+      category: task.category || null,
+      tags: task.tags || [],
+      dependencies: task.dependencies || [],
+      attachments: task.attachments || [],
+      comments: parsedComments,
+      createdAt: task.created_at,
+      updatedAt: task.updated_at || null,
+      completedAt: task.completed_at || null
+    };
+  });
 };
 
 /**
