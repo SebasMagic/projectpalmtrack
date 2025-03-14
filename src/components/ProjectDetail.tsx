@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import {
   Card,
@@ -112,6 +113,10 @@ const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, transactions, fi
     onTransactionAdded?.();
   };
 
+  const handleCancel = () => {
+    setIsAddTransactionOpen(false);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-2 md:flex-row md:justify-between md:items-center">
@@ -199,7 +204,10 @@ const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, transactions, fi
                 </Button>
               </CardHeader>
               <CardContent>
-                <PLTracker transactions={transactions} />
+                <PLTracker 
+                  transactions={transactions} 
+                  financials={financials}
+                />
               </CardContent>
             </Card>
           </div>
@@ -228,7 +236,11 @@ const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, transactions, fi
           <DialogHeader>
             <DialogTitle>Add Transaction</DialogTitle>
           </DialogHeader>
-          <AddTransactionForm projectId={project.id} onSuccess={onTransactionAddedHandler} />
+          <AddTransactionForm 
+            projectId={project.id} 
+            onSuccess={onTransactionAddedHandler} 
+            onCancel={handleCancel}
+          />
         </DialogContent>
       </Dialog>
     </div>
