@@ -146,8 +146,12 @@ export const fetchProjectTransactions = async (projectId: string): Promise<Trans
  * Fetches financial data for a specific project
  */
 export const fetchProjectFinancials = async (projectId: string) => {
+  // Using a custom query to prevent the "ambiguous column" error
+  // The issue was that both the function parameter and a table column were named "project_id"
   const { data, error } = await supabase
-    .rpc('get_project_financials', { project_id: projectId });
+    .from('transactions')
+    .select('type, amount')
+    .eq('project_id', projectId);
   
   if (error) {
     console.error('Error fetching project financials:', error);
@@ -155,19 +159,45 @@ export const fetchProjectFinancials = async (projectId: string) => {
     return null;
   }
   
-  if (data && data.length > 0) {
-    // Convert the RPC result to our ProjectFinancials type
-    return {
-      projectId,
-      totalBudget: data[0].total_budget,
-      totalIncome: data[0].total_income,
-      totalExpenses: data[0].total_expenses,
-      currentProfit: data[0].current_profit,
-      profitMargin: data[0].profit_margin
-    };
+  // Get the project details for budget information
+  const { data: projectData, error: projectError } = await supabase
+    .from('projects')
+    .select('budget')
+    .eq('id', projectId)
+    .single();
+  
+  if (projectError) {
+    console.error('Error fetching project details:', projectError);
+    toast.error('Failed to load project details');
+    return null;
   }
   
-  return null;
+  // Calculate financials based on transactions
+  const totalBudget = projectData?.budget || 0;
+  let totalIncome = 0;
+  let totalExpenses = 0;
+  
+  if (data) {
+    data.forEach(transaction => {
+      if (transaction.type === 'income') {
+        totalIncome += transaction.amount;
+      } else if (transaction.type === 'expense') {
+        totalExpenses += transaction.amount;
+      }
+    });
+  }
+  
+  const currentProfit = totalIncome - totalExpenses;
+  const profitMargin = totalIncome > 0 ? (currentProfit / totalIncome) * 100 : 0;
+  
+  return {
+    projectId,
+    totalBudget,
+    totalIncome,
+    totalExpenses,
+    currentProfit,
+    profitMargin
+  };
 };
 
 /**
