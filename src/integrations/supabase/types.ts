@@ -9,13 +9,112 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      projects: {
+        Row: {
+          budget: number
+          client: string
+          completion: number
+          created_at: string
+          description: string
+          end_date: string | null
+          id: string
+          location: string
+          name: string
+          start_date: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          budget: number
+          client: string
+          completion?: number
+          created_at?: string
+          description: string
+          end_date?: string | null
+          id?: string
+          location: string
+          name: string
+          start_date: string
+          status: string
+          updated_at?: string
+        }
+        Update: {
+          budget?: number
+          client?: string
+          completion?: number
+          created_at?: string
+          description?: string
+          end_date?: string | null
+          id?: string
+          location?: string
+          name?: string
+          start_date?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      transactions: {
+        Row: {
+          amount: number
+          category: string
+          created_at: string
+          date: string
+          description: string | null
+          id: string
+          project_id: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          category: string
+          created_at?: string
+          date: string
+          description?: string | null
+          id?: string
+          project_id: string
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          category?: string
+          created_at?: string
+          date?: string
+          description?: string | null
+          id?: string
+          project_id?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transactions_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_project_financials: {
+        Args: {
+          project_id: string
+        }
+        Returns: {
+          total_budget: number
+          total_income: number
+          total_expenses: number
+          current_profit: number
+          profit_margin: number
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
