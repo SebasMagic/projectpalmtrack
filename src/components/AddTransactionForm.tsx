@@ -58,6 +58,7 @@ export default function AddTransactionForm({
     const loadCategories = async () => {
       setIsLoading(true);
       try {
+        console.log('Loading transaction categories...');
         const categoriesData = await fetchTransactionCategories();
         console.log('Fetched categories:', categoriesData);
         setCategories(categoriesData || []);

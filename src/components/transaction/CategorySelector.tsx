@@ -22,7 +22,7 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
   isLoading,
   selectedType
 }) => {
-  // Filter categories based on selected type
+  // Filter categories based on selected type and ensure we have an array
   const filteredCategories = categories?.filter(category => category.type === selectedType) || [];
   
   console.log('Filtered categories:', filteredCategories);
@@ -57,8 +57,8 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
                 </Button>
               </FormControl>
             </PopoverTrigger>
-            <PopoverContent className="w-full p-0">
-              <Command>
+            <PopoverContent className="w-full p-0" align="start" side="bottom">
+              <Command className="w-full">
                 <CommandInput placeholder="Search category..." />
                 <CommandEmpty>No category found.</CommandEmpty>
                 {filteredCategories && filteredCategories.length > 0 ? (
