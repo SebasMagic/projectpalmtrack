@@ -39,6 +39,9 @@ const ProjectView = () => {
       if (projectData) {
         console.log("Project found:", projectData.name);
         
+        // Validate the status before assigning it to ensure it matches our type
+        const validStatus: Project['status'] = validateProjectStatus(projectData.status);
+        
         // Map the Supabase project data to our Project type
         const formattedProject: Project = {
           id: projectData.id,
@@ -50,7 +53,7 @@ const ProjectView = () => {
           endDate: projectData.end_date,
           dueDate: projectData.due_date,
           budget: projectData.budget,
-          status: projectData.status,
+          status: validStatus,
           completion: projectData.completion,
           description: projectData.description || '',
         };
@@ -87,6 +90,17 @@ const ProjectView = () => {
       setLoading(false);
     }
   }, [id]);
+
+  // Helper function to validate project status
+  const validateProjectStatus = (status: string): Project['status'] => {
+    const validStatuses: Project['status'][] = ['planning', 'active', 'completed', 'on-hold'];
+    if (validStatuses.includes(status as Project['status'])) {
+      return status as Project['status'];
+    }
+    // Return a default value if the status isn't valid
+    console.warn(`Invalid project status: "${status}". Defaulting to "planning".`);
+    return 'planning';
+  };
 
   const handleRefresh = async () => {
     setRefreshing(true);
