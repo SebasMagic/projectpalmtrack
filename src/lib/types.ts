@@ -43,3 +43,13 @@ export interface DashboardStats {
     dueDate: string;
   }>;
 }
+
+export interface Task {
+  id: string;
+  projectId: string;
+  title: string;
+  description: string | null;
+  status: 'todo' | 'in-progress' | 'completed';
+  dueDate: string | null;
+  createdAt: string;
+}
