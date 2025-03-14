@@ -110,7 +110,7 @@ export const fetchProjects = async (): Promise<Project[]> => {
     location: project.location,
     startDate: project.start_date,
     endDate: project.end_date,
-    dueDate: project.due_date, // Fix: Map due_date from Supabase to dueDate in our model
+    dueDate: project.due_date || null, // Handle the case when due_date might not exist in the DB
     budget: project.budget,
     status: project.status as 'planning' | 'active' | 'completed' | 'on-hold',
     completion: project.completion,
