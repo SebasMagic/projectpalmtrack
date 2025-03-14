@@ -11,7 +11,7 @@ export const fetchProjects = async (): Promise<Project[]> => {
     .from('projects')
     .select(`
       *,
-      cities:city_id (
+      cities:city_id!fk_projects_city_id (
         id,
         name,
         state
@@ -52,7 +52,7 @@ export const fetchProjectById = async (projectId: string): Promise<Project | nul
     .from('projects')
     .select(`
       *,
-      cities:city_id (
+      cities:city_id!fk_projects_city_id (
         id,
         name,
         state
