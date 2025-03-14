@@ -23,12 +23,16 @@ export const migrateDataToSupabase = async () => {
 
     // Prepare projects for insertion
     const projectsToInsert = MOCK_PROJECTS.map(project => ({
-      ...project,
+      id: project.id,
+      name: project.name,
+      client: project.client,
+      location: project.location,
       start_date: project.startDate,
       end_date: project.endDate,
-      // Remove the fields that don't match the database schema
-      startDate: undefined,
-      endDate: undefined
+      budget: project.budget,
+      status: project.status,
+      completion: project.completion,
+      description: project.description
     }));
 
     // Insert projects
@@ -43,8 +47,13 @@ export const migrateDataToSupabase = async () => {
 
     // Prepare transactions for insertion
     const transactionsToInsert = MOCK_TRANSACTIONS.map(transaction => ({
-      ...transaction,
+      id: transaction.id,
+      project_id: transaction.projectId,
       date: transaction.date,
+      amount: transaction.amount,
+      type: transaction.type,
+      category: transaction.category,
+      description: transaction.description
     }));
 
     // Insert transactions
