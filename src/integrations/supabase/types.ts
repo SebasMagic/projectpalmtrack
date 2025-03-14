@@ -81,6 +81,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "fk_projects_city_id"
+            columns: ["city_id"]
+            isOneToOne: false
+            referencedRelation: "cities"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "projects_city_id_fkey"
             columns: ["city_id"]
             isOneToOne: false

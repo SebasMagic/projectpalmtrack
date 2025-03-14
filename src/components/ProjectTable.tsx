@@ -1,5 +1,3 @@
-// Note: This file had a reference to @/lib/supabaseUtils which no longer exists
-// The import should now reference the new refactored files
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';

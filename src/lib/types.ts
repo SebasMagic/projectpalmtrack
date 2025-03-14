@@ -4,6 +4,7 @@ export interface Project {
   name: string;
   client: string;
   location: string;
+  cityId?: string; // Added cityId field to reference the cities table
   startDate: string;
   endDate: string | null;
   dueDate: string | null;
