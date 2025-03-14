@@ -2,7 +2,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useEffect, useState, useCallback } from 'react';
 import { getProjectById, getProjectFinancials, getProjectTransactions } from '@/lib/mockData';
-import { fetchProjectFinancials, fetchProjectTransactions, fetchProjects } from '@/lib/supabase';
+import { fetchProjectFinancials, fetchProjectTransactions } from '@/lib/supabase';
 import ProjectDetail from '@/components/ProjectDetail';
 import Navbar from '@/components/Navbar';
 import { Button } from '@/components/ui/button';
@@ -28,20 +28,43 @@ const ProjectView = () => {
       console.log("Loading project data for ID:", id);
       
       // Fetch projects
-      const projects = await fetchProjects();
-      const foundProject = projects.find(p => p.id === id);
+      const { data: projectData, error: projectError } = await supabase.from('projects').select('*').eq('id', id).single();
       
-      if (foundProject) {
-        console.log("Project found:", foundProject.name);
-        setProject(foundProject);
+      if (projectError) {
+        console.error("Error loading project from Supabase:", projectError);
+        throw projectError;
+      }
+      
+      if (projectData) {
+        console.log("Project found:", projectData.name);
+        
+        // Map the Supabase project data to our Project type
+        const formattedProject: Project = {
+          id: projectData.id,
+          name: projectData.name,
+          client: projectData.client,
+          location: projectData.location || '',
+          cityId: projectData.city_id,
+          startDate: projectData.start_date,
+          endDate: projectData.end_date,
+          dueDate: projectData.due_date,
+          budget: projectData.budget,
+          status: projectData.status,
+          completion: projectData.completion,
+          description: projectData.description || '',
+        };
+        
+        setProject(formattedProject);
         
         // Fetch transactions for this project
         const transactionData = await fetchProjectTransactions(id);
+        console.log("Fetched transactions:", transactionData.length);
         setTransactions(transactionData);
         
         // Fetch financial data for this project
         const financialData = await fetchProjectFinancials(id);
         if (financialData) {
+          console.log("Fetched financials:", financialData);
           setFinancials(financialData);
         }
       } else {
@@ -117,6 +140,7 @@ const ProjectView = () => {
   }
   
   console.log("Rendering ProjectView with project:", project.name);
+  console.log("Transactions to be displayed:", transactions.length);
   
   return (
     <div className="min-h-screen bg-background">

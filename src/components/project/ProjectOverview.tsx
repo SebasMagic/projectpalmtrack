@@ -39,6 +39,8 @@ const ProjectOverview: React.FC<ProjectOverviewProps> = ({
   financials,
   onAddTransactionClick
 }) => {
+  console.log("ProjectOverview received transactions:", transactions?.length || 0); // Debug logging
+  
   return <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard title="Total Budget" value={formatCurrency(financials.totalBudget)} icon={<Coins className="h-4 w-4 text-muted-foreground" />} />
@@ -94,7 +96,13 @@ const ProjectOverview: React.FC<ProjectOverviewProps> = ({
           </Button>
         </CardHeader>
         <CardContent>
-          <TransactionTable transactions={transactions} />
+          {transactions && transactions.length > 0 ? (
+            <TransactionTable transactions={transactions} />
+          ) : (
+            <div className="text-center py-8 text-muted-foreground">
+              No transactions found. Click 'Add Transaction' to create one.
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>;

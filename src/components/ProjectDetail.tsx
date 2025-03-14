@@ -38,6 +38,7 @@ const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, transactions, fi
   };
 
   console.log("Rendering ProjectDetail with project ID:", project.id);
+  console.log("Transactions data:", transactions); // Add logging to check transactions data
 
   return (
     <div className="space-y-6">

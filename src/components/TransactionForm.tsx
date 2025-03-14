@@ -81,6 +81,7 @@ export default function TransactionForm({ projectId, onSuccess, onCancel }: Tran
     async function loadCategories() {
       try {
         const categoriesData = await fetchTransactionCategories();
+        console.log("Loaded categories:", categoriesData);
         setCategories(categoriesData);
       } catch (error) {
         console.error("Error loading categories:", error);
@@ -96,11 +97,15 @@ export default function TransactionForm({ projectId, onSuccess, onCancel }: Tran
     (category) => category.type === transactionType
   );
 
+  console.log("Filtered categories for type", transactionType, ":", filteredCategories);
+
   // Handle form submission
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     
     try {
+      console.log("Submitting transaction with values:", values);
+      
       // Format the values for the database
       const transaction = {
         project_id: projectId,
@@ -111,6 +116,8 @@ export default function TransactionForm({ projectId, onSuccess, onCancel }: Tran
         description: values.description || null,
       };
       
+      console.log("Formatted transaction for Supabase:", transaction);
+      
       // Insert the transaction into Supabase
       const { data, error } = await supabase
         .from('transactions')
@@ -118,9 +125,11 @@ export default function TransactionForm({ projectId, onSuccess, onCancel }: Tran
         .select();
         
       if (error) {
+        console.error("Supabase error:", error);
         throw error;
       }
       
+      console.log("Transaction saved successfully:", data);
       toast.success(`${values.type === 'income' ? 'Income' : 'Expense'} added successfully`);
       onSuccess();
     } catch (error) {

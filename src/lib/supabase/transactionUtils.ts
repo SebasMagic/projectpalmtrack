@@ -7,14 +7,23 @@ import { toast } from "sonner";
  * Fetches transactions for a specific project
  */
 export const fetchProjectTransactions = async (projectId: string): Promise<Transaction[]> => {
+  console.log("Fetching transactions for project ID:", projectId);
   const { data, error } = await supabase
     .from('transactions')
     .select('*')
-    .eq('project_id', projectId);
+    .eq('project_id', projectId)
+    .order('date', { ascending: false });
   
   if (error) {
     console.error('Error fetching transactions:', error);
     toast.error('Failed to load transactions');
+    return [];
+  }
+  
+  console.log("Fetched transactions data:", data);
+  
+  if (!data || data.length === 0) {
+    console.log("No transactions found for this project");
     return [];
   }
   
@@ -109,7 +118,7 @@ export const fetchTransactionCategories = async (): Promise<TransactionCategory[
     
     return data.map(category => ({
       id: category.id,
-      name: category.Category, // Fix here: map 'Category' from DB to 'name' in our app
+      name: category.Category, // Map 'Category' from DB to 'name' in our app
       type: category.type as 'income' | 'expense'
     }));
   } catch (error) {
