@@ -36,12 +36,13 @@ const Navbar = () => {
         <div className="flex items-center justify-between">
           <Link 
             to="/" 
-            className="flex items-center space-x-2 text-xl font-bold"
+            className="flex items-center"
           >
-            <div className="w-8 h-8 rounded bg-primary flex items-center justify-center">
-              <span className="text-primary-foreground">OS</span>
-            </div>
-            <span className="hidden sm:inline-block text-primary">OneStopShop</span>
+            <img 
+              src="/lovable-uploads/0a4dc2a8-06ab-4aa4-8160-732ab14f78de.png" 
+              alt="OneStopShop Construction" 
+              className="h-10 md:h-12"
+            />
           </Link>
 
           {/* Desktop Navigation */}
