@@ -23,7 +23,9 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
   selectedType
 }) => {
   // Filter categories based on selected type and ensure we have an array
-  const filteredCategories = categories?.filter(category => category.type === selectedType) || [];
+  const filteredCategories = Array.isArray(categories) 
+    ? categories.filter(category => category.type === selectedType) 
+    : [];
   
   console.log('Filtered categories:', filteredCategories);
   console.log('Selected type:', selectedType);
@@ -57,13 +59,13 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
                 </Button>
               </FormControl>
             </PopoverTrigger>
-            <PopoverContent className="w-full p-0" align="start" side="bottom">
+            <PopoverContent className="w-[200px] p-0" align="start" side="bottom">
               <Command className="w-full">
                 <CommandInput placeholder="Search category..." />
                 <CommandEmpty>No category found.</CommandEmpty>
-                {filteredCategories && filteredCategories.length > 0 ? (
-                  <CommandGroup className="max-h-64 overflow-auto">
-                    {filteredCategories.map((category) => (
+                <CommandGroup className="max-h-64 overflow-auto">
+                  {filteredCategories.length > 0 ? (
+                    filteredCategories.map((category) => (
                       <CommandItem
                         value={category.name}
                         key={category.id}
@@ -81,13 +83,13 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
                         />
                         {category.name}
                       </CommandItem>
-                    ))}
-                  </CommandGroup>
-                ) : (
-                  <div className="py-6 text-center text-sm">
-                    {isLoading ? "Loading..." : "No categories available"}
-                  </div>
-                )}
+                    ))
+                  ) : (
+                    <CommandItem disabled className="py-2 text-center text-sm opacity-70">
+                      No {selectedType} categories available
+                    </CommandItem>
+                  )}
+                </CommandGroup>
               </Command>
             </PopoverContent>
           </Popover>
