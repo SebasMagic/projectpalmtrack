@@ -65,7 +65,7 @@ const ProjectTable: React.FC<ProjectTableProps> = ({ projects, onRefresh }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleViewProject = (projectId: string) => {
-    navigate(`/projects/${projectId}`);
+    navigate(`/project/${projectId}`);
   };
 
   const handleEditProject = (projectId: string) => {
