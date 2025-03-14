@@ -10,7 +10,7 @@ import { v4 as uuidv4 } from "uuid";
  */
 export const migrateDataToSupabase = async () => {
   try {
-    // Start by checking if we have data in the tables
+    // Start by checking if we have data in the projects table
     const { data: existingProjects } = await supabase
       .from('projects')
       .select('id')
@@ -43,6 +43,8 @@ export const migrateDataToSupabase = async () => {
         description: project.description
       };
     });
+
+    console.log('Inserting projects:', projectsToInsert);
 
     // Insert projects
     const { error: projectsError } = await supabase
