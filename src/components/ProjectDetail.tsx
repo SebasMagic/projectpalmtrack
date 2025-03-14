@@ -1,13 +1,6 @@
 
 import React, { useState } from 'react';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { Project, Transaction, ProjectFinancials } from '@/lib/types';
-import AddTransactionForm from '@/components/AddTransactionForm';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PerformanceTracker from "@/components/PerformanceTracker";
 import ProjectHeader from './project/ProjectHeader';
@@ -22,19 +15,9 @@ interface ProjectDetailProps {
 }
 
 const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, transactions, financials, onTransactionAdded }) => {
-  const [isAddTransactionOpen, setIsAddTransactionOpen] = useState(false);
-
-  const onTransactionAddedHandler = () => {
-    setIsAddTransactionOpen(false);
-    onTransactionAdded?.();
-  };
-
-  const handleCancel = () => {
-    setIsAddTransactionOpen(false);
-  };
-
   const handleAddTransactionClick = () => {
-    setIsAddTransactionOpen(true);
+    // This function will be rebuilt later
+    console.log("Add transaction button clicked - functionality removed");
   };
 
   console.log("Rendering ProjectDetail with project ID:", project.id);
@@ -67,19 +50,6 @@ const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, transactions, fi
           <PerformanceTracker project={project} transactions={transactions} financials={financials} />
         </TabsContent>
       </Tabs>
-      
-      <Dialog open={isAddTransactionOpen} onOpenChange={setIsAddTransactionOpen}>
-        <DialogContent className="sm:max-w-[600px]">
-          <DialogHeader>
-            <DialogTitle>Add Transaction</DialogTitle>
-          </DialogHeader>
-          <AddTransactionForm 
-            projectId={project.id} 
-            onSuccess={onTransactionAddedHandler} 
-            onCancel={handleCancel}
-          />
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };

@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -87,9 +88,9 @@ const ProjectOverview: React.FC<ProjectOverviewProps> = ({
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
           <CardTitle>Transactions</CardTitle>
-          <Button variant="outline" size="sm" onClick={onAddTransactionClick}>
+          <Button variant="outline" size="sm" onClick={onAddTransactionClick} disabled>
             <PlusCircle className="mr-1 h-4 w-4" />
-            Add Transaction
+            Add Transaction (Disabled)
           </Button>
         </CardHeader>
         <CardContent>
