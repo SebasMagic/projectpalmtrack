@@ -9,9 +9,31 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      cities: {
+        Row: {
+          created_at: string | null
+          id: string
+          name: string
+          state: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          name: string
+          state: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          name?: string
+          state?: string
+        }
+        Relationships: []
+      }
       projects: {
         Row: {
           budget: number
+          city_id: string | null
           client: string
           completion: number
           created_at: string
@@ -19,7 +41,7 @@ export type Database = {
           due_date: string | null
           end_date: string | null
           id: string
-          location: string
+          location: string | null
           name: string
           start_date: string
           status: string
@@ -27,6 +49,7 @@ export type Database = {
         }
         Insert: {
           budget: number
+          city_id?: string | null
           client: string
           completion?: number
           created_at?: string
@@ -34,7 +57,7 @@ export type Database = {
           due_date?: string | null
           end_date?: string | null
           id?: string
-          location: string
+          location?: string | null
           name: string
           start_date: string
           status: string
@@ -42,6 +65,7 @@ export type Database = {
         }
         Update: {
           budget?: number
+          city_id?: string | null
           client?: string
           completion?: number
           created_at?: string
@@ -49,13 +73,21 @@ export type Database = {
           due_date?: string | null
           end_date?: string | null
           id?: string
-          location?: string
+          location?: string | null
           name?: string
           start_date?: string
           status?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "projects_city_id_fkey"
+            columns: ["city_id"]
+            isOneToOne: false
+            referencedRelation: "cities"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       tasks: {
         Row: {

@@ -1,9 +1,9 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { Calendar as CalendarIcon } from "lucide-react";
+import { Calendar as CalendarIcon, Check, ChevronsUpDown, Search } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -13,13 +13,17 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchCities } from "@/lib/supabaseUtils";
 import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 const projectSchema = z.object({
   name: z.string().min(3, "Project name must be at least 3 characters"),
   client: z.string().min(2, "Client name is required"),
-  location: z.string().min(2, "Location is required"),
+  cityId: z.string().optional(),
+  location: z.string().optional(),
   description: z.string().min(10, "Description must be at least 10 characters"),
   budget: z.coerce.number().positive("Budget must be a positive number"),
   startDate: z.date({
@@ -37,8 +41,25 @@ interface AddProjectFormProps {
   onSuccess: () => void;
 }
 
+interface City {
+  id: string;
+  name: string;
+  state: string;
+}
+
 const AddProjectForm = ({ onSuccess }: AddProjectFormProps) => {
   const [submitting, setSubmitting] = useState(false);
+  const [cities, setCities] = useState<City[]>([]);
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    const loadCities = async () => {
+      const citiesData = await fetchCities();
+      setCities(citiesData);
+    };
+    
+    loadCities();
+  }, []);
 
   const form = useForm<z.infer<typeof projectSchema>>({
     resolver: zodResolver(projectSchema),
@@ -46,6 +67,7 @@ const AddProjectForm = ({ onSuccess }: AddProjectFormProps) => {
       name: "",
       client: "",
       location: "",
+      cityId: undefined,
       description: "",
       budget: 0,
       status: "planning",
@@ -62,7 +84,8 @@ const AddProjectForm = ({ onSuccess }: AddProjectFormProps) => {
       const projectData = {
         name: values.name,
         client: values.client,
-        location: values.location,
+        location: values.location || null,
+        city_id: values.cityId || null,
         description: values.description,
         budget: values.budget,
         start_date: format(values.startDate, "yyyy-MM-dd"),
@@ -129,17 +152,82 @@ const AddProjectForm = ({ onSuccess }: AddProjectFormProps) => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormField
             control={form.control}
+            name="cityId"
+            render={({ field }) => (
+              <FormItem className="flex flex-col">
+                <FormLabel>City</FormLabel>
+                <Popover open={open} onOpenChange={setOpen}>
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        variant="outline"
+                        role="combobox"
+                        aria-expanded={open}
+                        className={cn(
+                          "w-full justify-between",
+                          !field.value && "text-muted-foreground"
+                        )}
+                      >
+                        {field.value
+                          ? cities.find((city) => city.id === field.value)
+                            ? `${cities.find((city) => city.id === field.value)?.name}, ${cities.find((city) => city.id === field.value)?.state}`
+                            : "Select city"
+                          : "Select city"}
+                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-full p-0">
+                    <Command>
+                      <CommandInput placeholder="Search city..." className="h-9" icon={<Search className="h-4 w-4" />} />
+                      <CommandEmpty>No city found.</CommandEmpty>
+                      <CommandList>
+                        <CommandGroup>
+                          {cities.map((city) => (
+                            <CommandItem
+                              key={city.id}
+                              value={`${city.name}, ${city.state}`}
+                              onSelect={() => {
+                                form.setValue("cityId", city.id);
+                                setOpen(false);
+                              }}
+                            >
+                              {`${city.name}, ${city.state}`}
+                              <Check
+                                className={cn(
+                                  "ml-auto h-4 w-4",
+                                  city.id === field.value
+                                    ? "opacity-100"
+                                    : "opacity-0"
+                                )}
+                              />
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
             name="location"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Location</FormLabel>
+                <FormLabel>Additional Location Details (Optional)</FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter project location" {...field} />
+                  <Input placeholder="E.g., Building, Floor, Suite" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
           <FormField
             control={form.control}
             name="budget"
