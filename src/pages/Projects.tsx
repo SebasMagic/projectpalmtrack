@@ -7,11 +7,15 @@ import Navbar from '@/components/Navbar';
 import { Project } from '@/lib/types';
 import { fetchProjects, migrateDataToSupabase } from '@/lib/supabaseUtils';
 import { toast } from 'sonner';
+import { Plus } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import AddProjectForm from '@/components/AddProjectForm';
 
 const Projects = () => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [migrating, setMigrating] = useState(false);
+  const [isAddProjectOpen, setIsAddProjectOpen] = useState(false);
 
   useEffect(() => {
     loadProjects();
@@ -50,21 +54,44 @@ const Projects = () => {
     }
   };
 
+  const handleProjectAdded = () => {
+    loadProjects();
+    setIsAddProjectOpen(false);
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
       <main className="container mx-auto px-4 pt-24 pb-16">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">Projects</h1>
-          <Button 
-            onClick={handleMigrateData} 
-            disabled={migrating}
-            className="ml-auto"
-          >
-            {migrating ? 'Migrating...' : 'Migrate Data to Supabase'}
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              onClick={() => setIsAddProjectOpen(true)}
+              className="flex items-center gap-1"
+            >
+              <Plus size={18} />
+              Create New Project
+            </Button>
+            <Button 
+              onClick={handleMigrateData} 
+              disabled={migrating}
+              variant="outline"
+            >
+              {migrating ? 'Migrating...' : 'Migrate Data to Supabase'}
+            </Button>
+          </div>
         </div>
-        <ProjectTable projects={projects} />
+        <ProjectTable projects={projects} onRefresh={loadProjects} />
+
+        <Dialog open={isAddProjectOpen} onOpenChange={setIsAddProjectOpen}>
+          <DialogContent className="sm:max-w-[600px]">
+            <DialogHeader>
+              <DialogTitle>Create New Project</DialogTitle>
+            </DialogHeader>
+            <AddProjectForm onSuccess={handleProjectAdded} />
+          </DialogContent>
+        </Dialog>
       </main>
     </div>
   );

@@ -1,3 +1,4 @@
+
 import { useParams, useNavigate } from 'react-router-dom';
 import { useEffect, useState, useCallback } from 'react';
 import { getProjectById, getProjectFinancials, getProjectTransactions } from '@/lib/mockData';
@@ -5,7 +6,7 @@ import { fetchProjectFinancials, fetchProjectTransactions, fetchProjects } from 
 import ProjectDetail from '@/components/ProjectDetail';
 import Navbar from '@/components/Navbar';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, RefreshCw } from 'lucide-react';
 import { Project, ProjectFinancials, Transaction } from '@/lib/types';
 import { toast } from 'sonner';
 
@@ -17,6 +18,7 @@ const ProjectView = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [financials, setFinancials] = useState<ProjectFinancials | undefined>(undefined);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   const loadProjectData = useCallback(async () => {
     if (!id) return;
@@ -57,6 +59,18 @@ const ProjectView = () => {
       setLoading(false);
     }
   }, [id]);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    try {
+      await loadProjectData();
+      toast.success('Project data refreshed');
+    } catch (error) {
+      toast.error('Failed to refresh project data');
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
   useEffect(() => {
     loadProjectData();
@@ -102,20 +116,34 @@ const ProjectView = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       <main className="container mx-auto px-4 pt-20 pb-16">
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          className="mb-4"
-          onClick={() => navigate('/projects')}
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Projects
-        </Button>
+        <div className="flex justify-between items-center mb-6">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => navigate('/projects')}
+            className="flex items-center"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Projects
+          </Button>
+          
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleRefresh}
+            disabled={refreshing}
+            className="flex items-center gap-1"
+          >
+            <RefreshCw size={16} className={refreshing ? "animate-spin" : ""} />
+            {refreshing ? "Refreshing..." : "Refresh Data"}
+          </Button>
+        </div>
         
         <ProjectDetail 
           project={project} 
           transactions={transactions} 
           financials={financials} 
+          onTransactionAdded={loadProjectData}
         />
       </main>
     </div>

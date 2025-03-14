@@ -14,11 +14,13 @@ import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import { Project } from '@/lib/types';
 import { cn } from '@/lib/utils';
-import { ProjectFinancials } from '@/lib/types';
-import { getProjectFinancials } from '@/lib/mockData';
+import { Button } from '@/components/ui/button';
+import { RefreshCw } from 'lucide-react';
+import { fetchProjectFinancials } from '@/lib/supabaseUtils';
 
 interface ProjectTableProps {
   projects: Project[];
+  onRefresh?: () => void;
 }
 
 const formatCurrency = (amount: number) => {
@@ -53,8 +55,10 @@ const getStatusColor = (status: Project['status']) => {
   }
 };
 
-const ProjectTable = ({ projects }: ProjectTableProps) => {
+const ProjectTable = ({ projects, onRefresh }: ProjectTableProps) => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [projectProfits, setProjectProfits] = useState<{[key: string]: string}>({});
   const navigate = useNavigate();
 
   const filteredProjects = projects.filter(project => 
@@ -63,23 +67,54 @@ const ProjectTable = ({ projects }: ProjectTableProps) => {
     project.location.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const getProjectProfit = (projectId: string): string => {
-    const financials = getProjectFinancials(projectId);
-    if (!financials) return '-';
-    return `${formatCurrency(financials.currentProfit)} (${financials.profitMargin.toFixed(1)}%)`;
+  const getProjectProfit = async (projectId: string): Promise<string> => {
+    if (projectProfits[projectId]) {
+      return projectProfits[projectId];
+    }
+
+    try {
+      const financials = await fetchProjectFinancials(projectId);
+      if (!financials) return '-';
+      
+      const profitText = `${formatCurrency(financials.currentProfit)} (${financials.profitMargin.toFixed(1)}%)`;
+      setProjectProfits(prev => ({...prev, [projectId]: profitText}));
+      return profitText;
+    } catch (error) {
+      console.error(`Error fetching profit for project ${projectId}:`, error);
+      return '-';
+    }
+  };
+
+  const handleRefresh = async () => {
+    setLoading(true);
+    if (onRefresh) {
+      await onRefresh();
+    }
+    setLoading(false);
   };
 
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-semibold">Projects</h2>
-        <div className="w-1/3">
-          <Input
-            placeholder="Search projects..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="max-w-sm"
-          />
+        <div className="flex items-center gap-4">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleRefresh}
+            disabled={loading}
+            className="flex items-center gap-1"
+          >
+            <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
+            {loading ? "Refreshing..." : "Refresh"}
+          </Button>
+          <div className="w-full max-w-sm">
+            <Input
+              placeholder="Search projects..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
         </div>
       </div>
       
@@ -118,7 +153,10 @@ const ProjectTable = ({ projects }: ProjectTableProps) => {
                     {formatDate(project.startDate)} - {formatDate(project.endDate)}
                   </TableCell>
                   <TableCell>{formatCurrency(project.budget)}</TableCell>
-                  <TableCell>{getProjectProfit(project.id)}</TableCell>
+                  <TableCell>
+                    {projectProfits[project.id] || 
+                      <span className="text-muted-foreground">Loading...</span>}
+                  </TableCell>
                   <TableCell>
                     <Badge 
                       className={cn(
