@@ -3,39 +3,20 @@ import { useState, useEffect } from 'react';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { CalendarIcon, Check, ChevronsUpDown } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { fetchTransactionCategories } from '@/lib/supabase/transactionUtils';
 import { TransactionCategory } from '@/lib/types';
+import { v4 as uuidv4 } from 'uuid';
 
 import { Button } from '@/components/ui/button';
-import { Calendar } from '@/components/ui/calendar';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-} from '@/components/ui/command';
-import { cn } from '@/lib/utils';
-import { v4 as uuidv4 } from 'uuid';
+import { Form } from '@/components/ui/form';
+import { TransactionTypeSelector } from './transaction/TransactionTypeSelector';
+import { DatePickerField } from './transaction/DatePickerField';
+import { AmountField } from './transaction/AmountField';
+import { CategorySelector } from './transaction/CategorySelector';
+import { DescriptionField } from './transaction/DescriptionField';
 
 const transactionSchema = z.object({
   date: z.date(),
@@ -123,179 +104,26 @@ export default function AddTransactionForm({
     form.setValue('category', ''); // Reset category when type changes
   };
 
-  // Filter categories based on selected type
-  const filteredCategories = categories.filter(category => category.type === selectedType);
-
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="type"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Transaction Type</FormLabel>
-                <div className="flex space-x-2">
-                  <Button 
-                    type="button"
-                    variant={selectedType === 'income' ? 'default' : 'outline'}
-                    onClick={() => onTypeChange('income')}
-                    className="flex-1"
-                  >
-                    Income
-                  </Button>
-                  <Button 
-                    type="button"
-                    variant={selectedType === 'expense' ? 'default' : 'outline'}
-                    onClick={() => onTypeChange('expense')}
-                    className="flex-1"
-                  >
-                    Expense
-                  </Button>
-                </div>
-                <FormMessage />
-              </FormItem>
-            )}
+          <TransactionTypeSelector 
+            form={form} 
+            selectedType={selectedType} 
+            onTypeChange={onTypeChange} 
           />
-
-          <FormField
-            control={form.control}
-            name="date"
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel>Date</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant="outline"
-                        className={cn(
-                          "w-full pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground"
-                        )}
-                      >
-                        {field.value ? (
-                          format(field.value, "PPP")
-                        ) : (
-                          <span>Pick a date</span>
-                        )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={field.value}
-                      onSelect={field.onChange}
-                      disabled={(date) =>
-                        date > new Date() || date < new Date("1900-01-01")
-                      }
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <DatePickerField form={form} />
         </div>
 
-        <FormField
-          control={form.control}
-          name="amount"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Amount ($)</FormLabel>
-              <FormControl>
-                <Input
-                  type="number"
-                  step="0.01"
-                  placeholder="0.00"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+        <AmountField form={form} />
+        <CategorySelector 
+          form={form} 
+          categories={categories} 
+          isLoading={isLoading} 
+          selectedType={selectedType} 
         />
-
-        <FormField
-          control={form.control}
-          name="category"
-          render={({ field }) => (
-            <FormItem className="flex flex-col">
-              <FormLabel>Category</FormLabel>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <FormControl>
-                    <Button
-                      variant="outline"
-                      role="combobox"
-                      className={cn(
-                        "w-full justify-between",
-                        !field.value && "text-muted-foreground"
-                      )}
-                      disabled={isLoading}
-                    >
-                      {isLoading ? "Loading categories..." : 
-                        field.value ? field.value : "Select category"
-                      }
-                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                    </Button>
-                  </FormControl>
-                </PopoverTrigger>
-                <PopoverContent className="w-full p-0">
-                  <Command>
-                    <CommandInput placeholder="Search category..." />
-                    <CommandEmpty>No category found.</CommandEmpty>
-                    <CommandGroup>
-                      {filteredCategories.map((category) => (
-                        <CommandItem
-                          value={category.name}
-                          key={category.id}
-                          onSelect={() => {
-                            form.setValue("category", category.name);
-                          }}
-                        >
-                          <Check
-                            className={cn(
-                              "mr-2 h-4 w-4",
-                              category.name === field.value
-                                ? "opacity-100"
-                                : "opacity-0"
-                            )}
-                          />
-                          {category.name}
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  </Command>
-                </PopoverContent>
-              </Popover>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Description</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="Enter transaction details"
-                  className="resize-none"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <DescriptionField form={form} />
 
         <div className="flex justify-end space-x-2 pt-4">
           <Button variant="outline" type="button" onClick={onCancel}>
