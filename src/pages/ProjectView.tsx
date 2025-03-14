@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useEffect, useState, useCallback } from 'react';
 import { getProjectById, getProjectFinancials, getProjectTransactions } from '@/lib/mockData';
 import { fetchProjectFinancials, fetchProjectTransactions } from '@/lib/supabase';
+import { supabase } from '@/integrations/supabase/client'; // Add this import
 import ProjectDetail from '@/components/ProjectDetail';
 import Navbar from '@/components/Navbar';
 import { Button } from '@/components/ui/button';
