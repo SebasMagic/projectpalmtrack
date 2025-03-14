@@ -1,6 +1,5 @@
-
 import React, { useState, useEffect } from 'react';
-import { PlusCircle, Check, Clock, AlertCircle, Calendar, CalendarClock, CalendarDays } from 'lucide-react';
+import { PlusCircle, Check, Clock, AlertCircle, Calendar as CalendarIcon, CalendarClock, CalendarDays } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -38,7 +37,6 @@ const TaskManager: React.FC<TaskManagerProps> = ({ projectId }) => {
   const [isAddingTask, setIsAddingTask] = useState(false);
   const [viewMode, setViewMode] = useState<'list' | 'table'>('list');
   
-  // Load tasks for this project
   const loadTasks = async () => {
     setLoading(true);
     try {
@@ -75,7 +73,7 @@ const TaskManager: React.FC<TaskManagerProps> = ({ projectId }) => {
       setNewTaskStatus('todo');
       setIsAddingTask(false);
       toast.success('Task added successfully');
-      loadTasks(); // Refresh tasks list
+      loadTasks();
     } catch (error) {
       console.error('Error adding task:', error);
       toast.error('Failed to add task');
@@ -87,7 +85,6 @@ const TaskManager: React.FC<TaskManagerProps> = ({ projectId }) => {
       const newStatus = completed ? 'completed' : 'todo';
       await updateTaskStatus(taskId, newStatus);
       
-      // Update local state
       setTasks(tasks.map(task => 
         task.id === taskId ? { ...task, status: newStatus } : task
       ));
@@ -187,7 +184,7 @@ const TaskManager: React.FC<TaskManagerProps> = ({ projectId }) => {
               <Popover>
                 <PopoverTrigger asChild>
                   <Button variant="outline" size="icon" className="w-10">
-                    <Calendar className="h-4 w-4" />
+                    <CalendarIcon className="h-4 w-4" />
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="end">
