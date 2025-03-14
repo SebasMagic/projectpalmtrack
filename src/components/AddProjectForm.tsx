@@ -3,7 +3,7 @@ import { useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { Calendar } from "lucide-react";
+import { Calendar as CalendarIcon } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { Calendar } from "@/components/ui/calendar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
@@ -25,8 +25,10 @@ const projectSchema = z.object({
   startDate: z.date({
     required_error: "Start date is required",
   }),
+  dueDate: z.date({
+    required_error: "Due date is required",
+  }),
   endDate: z.date().optional(),
-  dueDate: z.date().optional(),
   status: z.enum(["planning", "active", "on-hold", "completed"]),
   completion: z.coerce.number().min(0).max(100).default(0),
 });
@@ -162,13 +164,13 @@ const AddProjectForm = ({ onSuccess }: AddProjectFormProps) => {
                         variant="outline"
                         className={`w-full justify-start text-left font-normal ${!field.value && "text-muted-foreground"}`}
                       >
-                        <Calendar className="mr-2 h-4 w-4" />
+                        <CalendarIcon className="mr-2 h-4 w-4" />
                         {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
                       </Button>
                     </FormControl>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="start">
-                    <CalendarComponent
+                    <Calendar
                       mode="single"
                       selected={field.value}
                       onSelect={field.onChange}
@@ -193,15 +195,15 @@ const AddProjectForm = ({ onSuccess }: AddProjectFormProps) => {
                         variant="outline"
                         className={`w-full justify-start text-left font-normal ${!field.value && "text-muted-foreground"}`}
                       >
-                        <Calendar className="mr-2 h-4 w-4" />
+                        <CalendarIcon className="mr-2 h-4 w-4" />
                         {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
                       </Button>
                     </FormControl>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="start">
-                    <CalendarComponent
+                    <Calendar
                       mode="single"
-                      selected={field.value ?? undefined}
+                      selected={field.value}
                       onSelect={field.onChange}
                       initialFocus
                     />
@@ -224,13 +226,13 @@ const AddProjectForm = ({ onSuccess }: AddProjectFormProps) => {
                         variant="outline"
                         className={`w-full justify-start text-left font-normal ${!field.value && "text-muted-foreground"}`}
                       >
-                        <Calendar className="mr-2 h-4 w-4" />
+                        <CalendarIcon className="mr-2 h-4 w-4" />
                         {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
                       </Button>
                     </FormControl>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="start">
-                    <CalendarComponent
+                    <Calendar
                       mode="single"
                       selected={field.value ?? undefined}
                       onSelect={field.onChange}
