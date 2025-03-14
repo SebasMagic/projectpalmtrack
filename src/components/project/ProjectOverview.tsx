@@ -5,15 +5,16 @@ import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { PlusCircle, Coins, BarChart3, Percent, CheckCircle } from "lucide-react";
 import { Project, Transaction, ProjectFinancials } from '@/lib/types';
-import PLTracker from '@/components/PLTracker';
 import TransactionTable from '@/components/TransactionTable';
 import StatCard from './StatCard';
+
 interface ProjectOverviewProps {
   project: Project;
   transactions: Transaction[];
   financials: ProjectFinancials;
   onAddTransactionClick: () => void;
 }
+
 const formatDate = (dateString: string | null) => {
   if (!dateString) return '-';
   return new Date(dateString).toLocaleDateString('en-US', {
@@ -22,6 +23,7 @@ const formatDate = (dateString: string | null) => {
     year: 'numeric'
   });
 };
+
 const formatCurrency = (amount: number) => {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
@@ -29,6 +31,7 @@ const formatCurrency = (amount: number) => {
     maximumFractionDigits: 0
   }).format(amount);
 };
+
 const ProjectOverview: React.FC<ProjectOverviewProps> = ({
   project,
   transactions,
@@ -43,8 +46,8 @@ const ProjectOverview: React.FC<ProjectOverviewProps> = ({
         <StatCard title="Completion" value={`${project.completion}%`} icon={<CheckCircle className="h-4 w-4 text-muted-foreground" />} progress={project.completion} />
       </div>
       
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-        <Card className="lg:col-span-2">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card>
           <CardHeader>
             <CardTitle>Project Details</CardTitle>
           </CardHeader>
@@ -70,19 +73,6 @@ const ProjectOverview: React.FC<ProjectOverviewProps> = ({
             </div>
           </CardContent>
         </Card>
-
-        <Card className="lg:col-span-3">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle>Financial Summary</CardTitle>
-            <Button variant="outline" size="sm" onClick={onAddTransactionClick}>
-              <PlusCircle className="mr-1 h-4 w-4" />
-              Add Transaction
-            </Button>
-          </CardHeader>
-          <CardContent>
-            <PLTracker transactions={transactions} financials={financials} />
-          </CardContent>
-        </Card>
       </div>
       
       <Card>
@@ -99,4 +89,5 @@ const ProjectOverview: React.FC<ProjectOverviewProps> = ({
       </Card>
     </div>;
 };
+
 export default ProjectOverview;

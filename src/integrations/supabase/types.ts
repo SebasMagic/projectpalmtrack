@@ -172,23 +172,23 @@ export type Database = {
       }
       transaction_categories: {
         Row: {
+          Category: string
           created_at: string
           id: string
-          name: string
           type: string
           updated_at: string
         }
         Insert: {
+          Category: string
           created_at?: string
           id?: string
-          name: string
           type: string
           updated_at?: string
         }
         Update: {
+          Category?: string
           created_at?: string
           id?: string
-          name?: string
           type?: string
           updated_at?: string
         }
