@@ -16,6 +16,7 @@ export type Database = {
           completion: number
           created_at: string
           description: string
+          due_date: string | null
           end_date: string | null
           id: string
           location: string
@@ -30,6 +31,7 @@ export type Database = {
           completion?: number
           created_at?: string
           description: string
+          due_date?: string | null
           end_date?: string | null
           id?: string
           location: string
@@ -44,6 +46,7 @@ export type Database = {
           completion?: number
           created_at?: string
           description?: string
+          due_date?: string | null
           end_date?: string | null
           id?: string
           location?: string

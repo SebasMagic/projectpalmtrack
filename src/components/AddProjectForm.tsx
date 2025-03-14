@@ -56,6 +56,8 @@ const AddProjectForm = ({ onSuccess }: AddProjectFormProps) => {
   const onSubmit = async (values: z.infer<typeof projectSchema>) => {
     setSubmitting(true);
     try {
+      console.log("Submitting project with values:", values);
+      
       // Format dates for Supabase
       const projectData = {
         name: values.name,
@@ -65,10 +67,12 @@ const AddProjectForm = ({ onSuccess }: AddProjectFormProps) => {
         budget: values.budget,
         start_date: format(values.startDate, "yyyy-MM-dd"),
         end_date: values.endDate ? format(values.endDate, "yyyy-MM-dd") : null,
-        due_date: values.dueDate ? format(values.dueDate, "yyyy-MM-dd") : null,
+        due_date: format(values.dueDate, "yyyy-MM-dd"),
         status: values.status,
         completion: values.completion,
       };
+
+      console.log("Formatted project data:", projectData);
 
       const { data, error } = await supabase
         .from("projects")
@@ -76,6 +80,7 @@ const AddProjectForm = ({ onSuccess }: AddProjectFormProps) => {
         .select();
 
       if (error) {
+        console.error("Supabase error:", error);
         throw error;
       }
 
