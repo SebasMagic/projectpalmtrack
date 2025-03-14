@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -7,6 +7,8 @@ import { CalendarIcon, Check, ChevronsUpDown } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { fetchTransactionCategories } from '@/lib/supabase/transactionUtils';
+import { TransactionCategory } from '@/lib/types';
 
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
@@ -43,26 +45,6 @@ const transactionSchema = z.object({
   description: z.string().optional(),
 });
 
-const transactionCategories = {
-  income: [
-    'Client Payment',
-    'Milestone Payment',
-    'Additional Services',
-    'Materials Reimbursement',
-    'Other Income'
-  ],
-  expense: [
-    'Labor',
-    'Materials',
-    'Equipment Rental',
-    'Permits & Fees',
-    'Subcontractor',
-    'Transportation',
-    'Administrative',
-    'Other Expense'
-  ]
-};
-
 type TransactionFormValues = z.infer<typeof transactionSchema>;
 
 interface AddTransactionFormProps {
@@ -77,6 +59,8 @@ export default function AddTransactionForm({
   onCancel 
 }: AddTransactionFormProps) {
   const [selectedType, setSelectedType] = useState<'income' | 'expense'>('income');
+  const [categories, setCategories] = useState<TransactionCategory[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   
   const form = useForm<TransactionFormValues>({
     resolver: zodResolver(transactionSchema),
@@ -88,6 +72,23 @@ export default function AddTransactionForm({
       description: '',
     },
   });
+
+  useEffect(() => {
+    const loadCategories = async () => {
+      setIsLoading(true);
+      try {
+        const categoriesData = await fetchTransactionCategories();
+        setCategories(categoriesData);
+      } catch (error) {
+        console.error('Error loading categories:', error);
+        toast.error('Failed to load categories');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    loadCategories();
+  }, []);
 
   async function onSubmit(values: TransactionFormValues) {
     try {
@@ -121,6 +122,9 @@ export default function AddTransactionForm({
     form.setValue('type', type);
     form.setValue('category', ''); // Reset category when type changes
   };
+
+  // Filter categories based on selected type
+  const filteredCategories = categories.filter(category => category.type === selectedType);
 
   return (
     <Form {...form}>
@@ -233,10 +237,11 @@ export default function AddTransactionForm({
                         "w-full justify-between",
                         !field.value && "text-muted-foreground"
                       )}
+                      disabled={isLoading}
                     >
-                      {field.value
-                        ? field.value
-                        : "Select category"}
+                      {isLoading ? "Loading categories..." : 
+                        field.value ? field.value : "Select category"
+                      }
                       <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                     </Button>
                   </FormControl>
@@ -246,23 +251,23 @@ export default function AddTransactionForm({
                     <CommandInput placeholder="Search category..." />
                     <CommandEmpty>No category found.</CommandEmpty>
                     <CommandGroup>
-                      {transactionCategories[selectedType].map((category) => (
+                      {filteredCategories.map((category) => (
                         <CommandItem
-                          value={category}
-                          key={category}
+                          value={category.name}
+                          key={category.id}
                           onSelect={() => {
-                            form.setValue("category", category);
+                            form.setValue("category", category.name);
                           }}
                         >
                           <Check
                             className={cn(
                               "mr-2 h-4 w-4",
-                              category === field.value
+                              category.name === field.value
                                 ? "opacity-100"
                                 : "opacity-0"
                             )}
                           />
-                          {category}
+                          {category.name}
                         </CommandItem>
                       ))}
                     </CommandGroup>

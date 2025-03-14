@@ -24,6 +24,12 @@ export interface Transaction {
   description: string;
 }
 
+export interface TransactionCategory {
+  id: string;
+  name: string;
+  type: 'income' | 'expense';
+}
+
 export interface ProjectFinancials {
   projectId: string;
   totalBudget: number;

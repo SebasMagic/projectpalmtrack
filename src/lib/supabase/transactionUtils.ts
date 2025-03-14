@@ -1,6 +1,5 @@
-
 import { supabase } from "@/integrations/supabase/client";
-import { Transaction } from "../types";
+import { Transaction, TransactionCategory } from "../types";
 import { toast } from "sonner";
 
 /**
@@ -33,8 +32,6 @@ export const fetchProjectTransactions = async (projectId: string): Promise<Trans
  * Fetches financial data for a specific project
  */
 export const fetchProjectFinancials = async (projectId: string) => {
-  // Using a custom query to prevent the "ambiguous column" error
-  // The issue was that both the function parameter and a table column were named "project_id"
   const { data, error } = await supabase
     .from('transactions')
     .select('type, amount')
@@ -46,7 +43,6 @@ export const fetchProjectFinancials = async (projectId: string) => {
     return null;
   }
   
-  // Get the project details for budget information
   const { data: projectData, error: projectError } = await supabase
     .from('projects')
     .select('budget')
@@ -59,7 +55,6 @@ export const fetchProjectFinancials = async (projectId: string) => {
     return null;
   }
   
-  // Calculate financials based on transactions
   const totalBudget = projectData?.budget || 0;
   let totalIncome = 0;
   let totalExpenses = 0;
@@ -85,4 +80,26 @@ export const fetchProjectFinancials = async (projectId: string) => {
     currentProfit,
     profitMargin
   };
+};
+
+/**
+ * Fetches transaction categories from database
+ */
+export const fetchTransactionCategories = async (): Promise<TransactionCategory[]> => {
+  const { data, error } = await supabase
+    .from('transaction_categories')
+    .select('*')
+    .order('name');
+  
+  if (error) {
+    console.error('Error fetching transaction categories:', error);
+    toast.error('Failed to load transaction categories');
+    return [];
+  }
+  
+  return data.map(category => ({
+    id: category.id,
+    name: category.name,
+    type: category.type as 'income' | 'expense'
+  }));
 };
