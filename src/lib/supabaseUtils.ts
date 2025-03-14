@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { MOCK_PROJECTS, MOCK_TRANSACTIONS } from "./mockData";
 import { Project, Transaction } from "./types";
@@ -212,7 +211,7 @@ export const fetchDashboardStats = async () => {
   const activeProjects = projects.filter(p => p.status === 'active').length;
   const completedProjects = projects.filter(p => p.status === 'completed').length;
   
-  // Get upcoming deadlines
+  // Get upcoming deadlines - use endDate since dueDate doesn't exist in our schema
   const upcomingDeadlines = projects
     .filter(p => p.endDate && new Date(p.endDate) > new Date())
     .sort((a, b) => {
@@ -227,7 +226,6 @@ export const fetchDashboardStats = async () => {
     }));
   
   // Calculate total revenue and profit
-  // This would ideally come from an RPC but for now we'll calculate it
   let totalRevenue = 0;
   let totalProfit = 0;
   
@@ -244,6 +242,6 @@ export const fetchDashboardStats = async () => {
     completedProjects,
     totalRevenue,
     totalProfit,
-    upcomingDeadlines
+    upcomingDeadlines: upcomingDeadlines || [] // Ensure we always return an array, even if empty
   };
 };

@@ -118,26 +118,32 @@ const Dashboard = ({ stats, recentProjects }: DashboardProps) => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {stats.upcomingDeadlines.map(deadline => (
-                <div key={deadline.projectId} className="flex items-center justify-between">
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium leading-none">{deadline.projectName}</p>
-                    <p className="text-xs text-muted-foreground">Due {formatDate(deadline.dueDate)}</p>
+            {stats.upcomingDeadlines && stats.upcomingDeadlines.length > 0 ? (
+              <div className="space-y-4">
+                {stats.upcomingDeadlines.map(deadline => (
+                  <div key={deadline.projectId} className="flex items-center justify-between">
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium leading-none">{deadline.projectName}</p>
+                      <p className="text-xs text-muted-foreground">Due {formatDate(deadline.dueDate)}</p>
+                    </div>
+                    <div className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      new Date(deadline.dueDate).getTime() - new Date().getTime() < 7 * 24 * 60 * 60 * 1000
+                        ? 'bg-red-100 text-red-800'
+                        : 'bg-amber-100 text-amber-800'
+                    }`}>
+                      {new Date(deadline.dueDate).getTime() - new Date().getTime() < 7 * 24 * 60 * 60 * 1000
+                        ? 'Urgent'
+                        : 'Upcoming'
+                      }
+                    </div>
                   </div>
-                  <div className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    new Date(deadline.dueDate).getTime() - new Date().getTime() < 7 * 24 * 60 * 60 * 1000
-                      ? 'bg-red-100 text-red-800'
-                      : 'bg-amber-100 text-amber-800'
-                  }`}>
-                    {new Date(deadline.dueDate).getTime() - new Date().getTime() < 7 * 24 * 60 * 60 * 1000
-                      ? 'Urgent'
-                      : 'Upcoming'
-                    }
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <div className="py-4 text-center text-muted-foreground">
+                <p>No upcoming deadlines</p>
+              </div>
+            )}
           </CardContent>
           <CardFooter className="border-t pt-4">
             <p className="text-xs text-muted-foreground">

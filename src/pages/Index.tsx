@@ -8,7 +8,10 @@ import { fetchDashboardStats, fetchProjects } from '@/lib/supabaseUtils';
 import { toast } from 'sonner';
 
 const Index = () => {
-  const [stats, setStats] = useState<DashboardStats>(MOCK_DASHBOARD_STATS);
+  const [stats, setStats] = useState<DashboardStats>({
+    ...MOCK_DASHBOARD_STATS,
+    upcomingDeadlines: [] // Ensure we have a default empty array
+  });
   const [recentProjects, setRecentProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -23,17 +26,26 @@ const Index = () => {
           
           // Load dashboard stats
           const statsData = await fetchDashboardStats();
-          setStats(statsData);
+          setStats({
+            ...statsData,
+            upcomingDeadlines: statsData.upcomingDeadlines || [] // Ensure we always have an array
+          });
         } else {
           // Fall back to mock data if no projects are found
           setRecentProjects(MOCK_PROJECTS);
-          setStats(MOCK_DASHBOARD_STATS);
+          setStats({
+            ...MOCK_DASHBOARD_STATS,
+            upcomingDeadlines: MOCK_DASHBOARD_STATS.upcomingDeadlines || []
+          });
         }
       } catch (error) {
         console.error('Error loading dashboard data:', error);
         toast.error('Failed to load dashboard data. Using mock data instead.');
         setRecentProjects(MOCK_PROJECTS);
-        setStats(MOCK_DASHBOARD_STATS);
+        setStats({
+          ...MOCK_DASHBOARD_STATS,
+          upcomingDeadlines: MOCK_DASHBOARD_STATS.upcomingDeadlines || []
+        });
       } finally {
         setLoading(false);
       }
