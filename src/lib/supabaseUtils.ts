@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { MOCK_PROJECTS, MOCK_TRANSACTIONS } from "./mockData";
 import { Project, Transaction, Task, TaskComment } from "./types";
@@ -249,64 +248,79 @@ export const fetchDashboardStats = async () => {
  * Fetches tasks for a specific project
  */
 export const fetchProjectTasks = async (projectId: string): Promise<Task[]> => {
-  const { data, error } = await supabase
-    .from('tasks')
-    .select('*')
-    .eq('project_id', projectId)
-    .order('created_at', { ascending: false });
+  console.log('Fetching tasks for project:', projectId);
   
-  if (error) {
-    console.error('Error fetching tasks:', error);
-    toast.error('Failed to load tasks');
-    return [];
-  }
-  
-  return data.map(task => {
-    // Parse comments to ensure they are properly cast to TaskComment[]
-    let parsedComments: TaskComment[] = [];
+  try {
+    const { data, error } = await supabase
+      .from('tasks')
+      .select('*')
+      .eq('project_id', projectId)
+      .order('created_at', { ascending: false });
     
-    if (task.comments) {
-      try {
-        // If comments is already an array, map it to TaskComment structure
-        if (Array.isArray(task.comments)) {
-          parsedComments = task.comments.map((comment: any) => ({
-            id: comment.id || uuidv4(),
-            taskId: comment.taskId || task.id,
-            content: comment.content || '',
-            author: comment.author || 'Unknown',
-            createdAt: comment.createdAt || new Date().toISOString()
-          }));
-        } else {
-          // If it's not an array, use empty array
-          console.warn('Task comments not in expected format:', task.comments);
-        }
-      } catch (e) {
-        console.error('Error parsing task comments:', e);
-      }
+    if (error) {
+      console.error('Error fetching tasks:', error);
+      toast.error('Failed to load tasks');
+      return [];
     }
     
-    return {
-      id: task.id,
-      projectId: task.project_id,
-      title: task.title,
-      description: task.description,
-      status: task.status as 'todo' | 'in-progress' | 'completed' | 'blocked' | 'review',
-      priority: task.priority as 'low' | 'medium' | 'high' | 'urgent' || 'medium',
-      dueDate: task.due_date,
-      startDate: task.start_date || null,
-      estimatedHours: task.estimated_hours || null,
-      actualHours: task.actual_hours || null,
-      assignedTo: task.assigned_to || null,
-      category: task.category || null,
-      tags: task.tags || [],
-      dependencies: task.dependencies || [],
-      attachments: task.attachments || [],
-      comments: parsedComments,
-      createdAt: task.created_at,
-      updatedAt: task.updated_at || null,
-      completedAt: task.completed_at || null
-    };
-  });
+    if (!data || data.length === 0) {
+      console.log('No tasks found for project:', projectId);
+      return [];
+    }
+    
+    console.log(`Found ${data.length} tasks for project ${projectId}`);
+    
+    return data.map(task => {
+      // Parse comments to ensure they are properly cast to TaskComment[]
+      let parsedComments: TaskComment[] = [];
+      
+      if (task.comments) {
+        try {
+          // If comments is already an array, map it to TaskComment structure
+          if (Array.isArray(task.comments)) {
+            parsedComments = task.comments.map((comment: any) => ({
+              id: comment.id || uuidv4(),
+              taskId: comment.taskId || task.id,
+              content: comment.content || '',
+              author: comment.author || 'Unknown',
+              createdAt: comment.createdAt || new Date().toISOString()
+            }));
+          } else {
+            // If it's not an array, use empty array
+            console.warn('Task comments not in expected format:', task.comments);
+          }
+        } catch (e) {
+          console.error('Error parsing task comments:', e);
+        }
+      }
+      
+      return {
+        id: task.id,
+        projectId: task.project_id,
+        title: task.title,
+        description: task.description || '',
+        status: task.status as 'todo' | 'in-progress' | 'completed' | 'blocked' | 'review',
+        priority: (task.priority || 'medium') as 'low' | 'medium' | 'high' | 'urgent',
+        dueDate: task.due_date,
+        startDate: task.start_date || null,
+        estimatedHours: task.estimated_hours || null,
+        actualHours: task.actual_hours || null,
+        assignedTo: task.assigned_to || null,
+        category: task.category || null,
+        tags: task.tags || [],
+        dependencies: task.dependencies || [],
+        attachments: task.attachments || [],
+        comments: parsedComments,
+        createdAt: task.created_at,
+        updatedAt: task.updated_at || null,
+        completedAt: task.completed_at || null
+      };
+    });
+  } catch (err) {
+    console.error('Unexpected error fetching tasks:', err);
+    toast.error('Error inesperado al cargar tareas');
+    return [];
+  }
 };
 
 /**
