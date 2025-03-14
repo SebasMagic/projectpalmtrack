@@ -69,6 +69,19 @@ export default {
 					900: '#0f172a',
 					950: '#020617',
 				},
+				blue: {
+					DEFAULT: '#062b5b', // The requested blue
+					50: '#eef5ff',
+					100: '#d9e8ff',
+					200: '#bcd7ff',
+					300: '#8fbcff',
+					400: '#5b96ff',
+					500: '#3674ff',
+					600: '#1a52f5',
+					700: '#1141e0',
+					800: '#1437b5',
+					900: '#062b5b', // The requested blue
+				},
 				teal: {
 					DEFAULT: '#0d9488',
 					50: '#f0fdfa',
