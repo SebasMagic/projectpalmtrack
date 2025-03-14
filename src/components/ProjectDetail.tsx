@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import {
   Card,
@@ -117,6 +118,8 @@ const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, transactions, fi
     setIsAddTransactionOpen(false);
   };
 
+  console.log("Rendering ProjectDetail with project ID:", project.id);
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-2 md:flex-row md:justify-between md:items-center">
@@ -228,7 +231,11 @@ const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, transactions, fi
         </TabsContent>
         
         <TabsContent value="tasks">
-          <TaskManager projectId={project.id} />
+          <div className="bg-white rounded-md shadow">
+            {project && project.id && (
+              <TaskManager projectId={project.id} />
+            )}
+          </div>
         </TabsContent>
         
         <TabsContent value="performance">

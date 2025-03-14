@@ -25,11 +25,14 @@ const ProjectView = () => {
     
     setLoading(true);
     try {
+      console.log("Loading project data for ID:", id);
+      
       // Fetch projects
       const projects = await fetchProjects();
       const foundProject = projects.find(p => p.id === id);
       
       if (foundProject) {
+        console.log("Project found:", foundProject.name);
         setProject(foundProject);
         
         // Fetch transactions for this project
@@ -42,6 +45,7 @@ const ProjectView = () => {
           setFinancials(financialData);
         }
       } else {
+        console.warn("Project not found in database, falling back to mock data");
         // Fall back to mock data if project not found in database
         setProject(getProjectById(id));
         setTransactions(getProjectTransactions(id));
@@ -111,6 +115,8 @@ const ProjectView = () => {
       </div>
     );
   }
+  
+  console.log("Rendering ProjectView with project:", project.name);
   
   return (
     <div className="min-h-screen bg-background">

@@ -271,7 +271,7 @@ export const fetchProjectTasks = async (projectId: string): Promise<Task[]> => {
     console.log(`Found ${data.length} tasks for project ${projectId}`);
     
     return data.map(task => {
-      // Parse comments to ensure they are properly cast to TaskComment[]
+      // Ensure comments is properly parsed and has the right format
       let parsedComments: TaskComment[] = [];
       
       if (task.comments) {
@@ -285,9 +285,6 @@ export const fetchProjectTasks = async (projectId: string): Promise<Task[]> => {
               author: comment.author || 'Unknown',
               createdAt: comment.createdAt || new Date().toISOString()
             }));
-          } else {
-            // If it's not an array, use empty array
-            console.warn('Task comments not in expected format:', task.comments);
           }
         } catch (e) {
           console.error('Error parsing task comments:', e);
@@ -300,16 +297,16 @@ export const fetchProjectTasks = async (projectId: string): Promise<Task[]> => {
         title: task.title,
         description: task.description || '',
         status: task.status as 'todo' | 'in-progress' | 'completed' | 'blocked' | 'review',
-        priority: (task.priority || 'medium') as 'low' | 'medium' | 'high' | 'urgent',
+        priority: task.priority as 'low' | 'medium' | 'high' | 'urgent',
         dueDate: task.due_date,
         startDate: task.start_date || null,
         estimatedHours: task.estimated_hours || null,
         actualHours: task.actual_hours || null,
         assignedTo: task.assigned_to || null,
         category: task.category || null,
-        tags: task.tags || [],
-        dependencies: task.dependencies || [],
-        attachments: task.attachments || [],
+        tags: Array.isArray(task.tags) ? task.tags : [],
+        dependencies: Array.isArray(task.dependencies) ? task.dependencies : [],
+        attachments: Array.isArray(task.attachments) ? task.attachments : [],
         comments: parsedComments,
         createdAt: task.created_at,
         updatedAt: task.updated_at || null,
@@ -318,7 +315,7 @@ export const fetchProjectTasks = async (projectId: string): Promise<Task[]> => {
     });
   } catch (err) {
     console.error('Unexpected error fetching tasks:', err);
-    toast.error('Error inesperado al cargar tareas');
+    toast.error('Error al cargar tareas');
     return [];
   }
 };
